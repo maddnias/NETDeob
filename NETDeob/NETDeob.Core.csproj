@@ -1,0 +1,191 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">x86</Platform>
+    <ProductVersion>8.0.30703</ProductVersion>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectGuid>{FD35670D-3198-418E-B6AE-4F1DDC6E609B}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>NETDeob.Core</RootNamespace>
+    <AssemblyName>NETDeob.Core</AssemblyName>
+    <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
+    <TargetFrameworkProfile>
+    </TargetFrameworkProfile>
+    <FileAlignment>512</FileAlignment>
+    <SccProjectName>Svn</SccProjectName>
+    <SccLocalPath>Svn</SccLocalPath>
+    <SccAuxPath>Svn</SccAuxPath>
+    <SccProvider>SubversionScc</SccProvider>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|x86' ">
+    <PlatformTarget>x86</PlatformTarget>
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|x86' ">
+    <PlatformTarget>x86</PlatformTarget>
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+  </PropertyGroup>
+  <PropertyGroup>
+    <StartupObject />
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="Mono.Cecil, Version=0.9.5.0, Culture=neutral, PublicKeyToken=9c07db36cfb6fff4, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>.\Mono.Cecil.dll</HintPath>
+    </Reference>
+    <Reference Include="SevenZipSharp">
+      <HintPath>.\SevenZipSharp.dll</HintPath>
+    </Reference>
+    <Reference Include="System" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Deployment" />
+    <Reference Include="System.Drawing" />
+    <Reference Include="System.Windows.Forms" />
+    <Reference Include="System.Xml" />
+    <Reference Include="WindowsBase" />
+    <Reference Include="zip">
+      <HintPath>.\zip.dll</HintPath>
+    </Reference>
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Deobfuscators\Confuser\Tasks\1_7\ProxyResolver2.cs" />
+    <Compile Include="Deobfuscators\Generic\MetadataFixer.cs" />
+    <Compile Include="Deobfuscators\HurpFuscator\HurpDeobfuscator.cs" />
+    <Compile Include="Deobfuscators\HurpFuscator\Tasks\StringDecrypter2.cs" />
+    <Compile Include="Deobfuscators\HurpFuscator\Tasks\StringDecryptor1.cs" />
+    <Compile Include="Deobfuscators\Manco\Tasks\CFlowCleaner.cs" />
+    <Compile Include="Deobfuscators\Obsolete\CodeFort\CodeFortDeobfuscator.cs" />
+    <Compile Include="Deobfuscators\Obsolete\CodeFort\Tasks\StringDecryptor.cs" />
+    <Compile Include="Deobfuscators\Obsolete\CodeWall\CodeWallDeobfuscator.cs" />
+    <Compile Include="Deobfuscators\Obsolete\CodeWall\Tasks\StringDecryptor.cs" />
+    <Compile Include="Deobfuscators\Obsolete\CodeWall\Tasks\StubDumper2.cs" />
+    <Compile Include="Deobfuscators\Confuser\ConfuserDeobfuscator.cs" />
+    <Compile Include="Deobfuscators\Confuser\Obsolete\ConstantsDecryptor.cs" />
+    <Compile Include="Deobfuscators\Confuser\Obsolete\Utils\DynamicEvaluator.cs" />
+    <Compile Include="Deobfuscators\Confuser\Tasks\1_7\AntiDebug.cs" />
+    <Compile Include="Deobfuscators\Confuser\Tasks\1_7\AntiDump.cs" />
+    <Compile Include="Deobfuscators\Confuser\Tasks\1_7\AntiILDasm.cs" />
+    <Compile Include="Deobfuscators\Confuser\Tasks\1_7\ConstantsDecryptor.cs" />
+    <Compile Include="Deobfuscators\Confuser\Tasks\1_7\ProxyResolver.cs" />
+    <Compile Include="Deobfuscators\Confuser\Tasks\1_7\ResourceDecryptor.cs" />
+    <Compile Include="Deobfuscators\Confuser\Tasks\1_7\StackUnderflowRemover.cs" />
+    <Compile Include="Deobfuscators\Confuser\Tasks\1_7\Unpacker.cs" />
+    <Compile Include="Deobfuscators\Confuser\Tasks\Common\WatermarkRemover.cs" />
+    <Compile Include="Deobfuscators\Generic\AssemblyStripper.cs" />
+    <Compile Include="Deobfuscators\Generic\Obsolete\Emulation\ConstantFolder.cs" />
+    <Compile Include="Deobfuscators\Generic\Obsolete\Control Flow\ILBlock.cs" />
+    <Compile Include="Deobfuscators\Generic\Obsolete\MethodCleaner.cs" />
+    <Compile Include="Deobfuscators\Generic\MethodCleaner2.cs" />
+    <Compile Include="Deobfuscators\Generic\Renamer.cs" />
+    <Compile Include="Deobfuscators\Manco\MancoDeobfuscator.cs" />
+    <Compile Include="Deobfuscators\Manco\Tasks\StringDecryptor.cs" />
+    <Compile Include="Deobfuscators\Obfusasm\ObfusasmDeobfuscator.cs" />
+    <Compile Include="Deobfuscators\Obfusasm\Tasks\StringDecryptor.cs" />
+    <Compile Include="Deobfuscators\Rummage\Tasks\StringDecryptor.cs" />
+    <Compile Include="Deobfuscators\Rummage\RummageDeobfuscator.cs" />
+    <Compile Include="Engine\Signatures.cs" />
+    <Compile Include="Engine\Utils\Extensions\Assembly.cs" />
+    <Compile Include="Engine\Utils\Extensions\AssemblyDefinition.cs" />
+    <Compile Include="Engine\Utils\Extensions\Functional.cs" />
+    <Compile Include="Engine\Utils\Extensions\ILProcessor.cs" />
+    <Compile Include="Engine\Utils\Extensions\Instruction.cs" />
+    <Compile Include="Engine\Utils\Extensions\MethodDefinition.cs" />
+    <Compile Include="Engine\Utils\Extensions\Misc.cs" />
+    <Compile Include="Engine\Utils\Extensions\ModuleDefinition.cs" />
+    <Compile Include="Engine\Utils\Extensions\String.cs" />
+    <Compile Include="Engine\Utils\Extensions\TypeDefinition.cs" />
+    <Compile Include="Engine\Utils\LzmatWrapper.cs" />
+    <Compile Include="Engine\Utils\Extensions\InstructionCollection.cs" />
+    <Compile Include="Misc\AssemblyUtils.cs" />
+    <Compile Include="Misc\Structs, Enums &amp; Interfaces\Deobfuscation\ProxyResolver.cs" />
+    <Compile Include="Misc\Structs, Enums &amp; Interfaces\Deobfuscation\StringDecryptor.cs" />
+    <Compile Include="Misc\Structs, Enums &amp; Interfaces\Deobfuscation\PhaseAttribute.cs" />
+    <Compile Include="Misc\Structs, Enums &amp; Interfaces\Signatures\Base\ISignature.cs" />
+    <Compile Include="Misc\Structs, Enums &amp; Interfaces\Signatures\IPackerSignature.cs" />
+    <Compile Include="Misc\Structs, Enums &amp; Interfaces\Signatures\IUnsupportedSignature.cs" />
+    <Compile Include="Misc\Structs, Enums &amp; Interfaces\Signatures\IUnidentifiedSignature.cs" />
+    <Compile Include="Misc\Structs, Enums &amp; Interfaces\Signatures\IObfuscatorSignature.cs" />
+    <Compile Include="Misc\Structs, Enums &amp; Interfaces\Tasks\Base\Task.cs" />
+    <Compile Include="Misc\Structs, Enums &amp; Interfaces\Tasks\UnpackingTask.cs" />
+    <Compile Include="Unpackers\ExePack\ExePackUnpacker.cs" />
+    <Compile Include="Unpackers\ExePack\Tasks\Unpacker.cs" />
+    <Compile Include="Unpackers\Mpress\MpressUnpacker.cs" />
+    <Compile Include="Unpackers\Mpress\Tasks\Unpacker.cs" />
+    <Compile Include="Unpackers\NetShrink\NetShrinkUnpacker.cs" />
+    <Compile Include="Unpackers\NetShrink\Tasks\Unpacker.cs" />
+    <Compile Include="Unpackers\Netz\NetzUnpacker.cs" />
+    <Compile Include="Unpackers\Netz\Tasks\Unpacker.cs" />
+    <Compile Include="Unpackers\Rpx\RpxUnpacker.cs" />
+    <Compile Include="Unpackers\Rpx\Tasks\Unpacker.cs" />
+    <Compile Include="Deobfuscators\Unidentified\UnknownDeobfuscator.cs" />
+    <Compile Include="Engine\Utils\Logger.cs" />
+    <Compile Include="Misc\Structs, Enums &amp; Interfaces\Tasks\DeobfuscationTask.cs" />
+    <Compile Include="Deobfuscators\Phoenix Protector\PhoenixProtectorDeobfuscator.cs" />
+    <Compile Include="Deobfuscators\Phoenix Protector\Tasks\StringDecryptor.cs" />
+    <Compile Include="Engine\Utils\SignatureFinder.cs" />
+    <Compile Include="Engine\Utils\TaskAssigner.cs" />
+    <Compile Include="Engine\Utils\Identifier.cs" />
+    <Compile Include="Misc\DeobfuscatorContext.cs" />
+    <Compile Include="Misc\Structs, Enums &amp; Interfaces\Deobfuscation\AssemblyWorker.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Unpackers\Sixxpack\SixxpackUnpacker.cs" />
+    <Compile Include="Unpackers\Sixxpack\Tasks\Unpacker.cs" />
+    <EmbeddedResource Include="Properties\Resources.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <Compile Include="Properties\Resources.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DependentUpon>Resources.resx</DependentUpon>
+      <DesignTime>True</DesignTime>
+    </Compile>
+    <None Include="app.config" />
+    <None Include="Properties\Settings.settings">
+      <Generator>SettingsSingleFileGenerator</Generator>
+      <LastGenOutput>Settings.Designer.cs</LastGenOutput>
+    </None>
+    <Compile Include="Properties\Settings.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DependentUpon>Settings.settings</DependentUpon>
+      <DesignTimeSharedInput>True</DesignTimeSharedInput>
+    </Compile>
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="bin\Debug\test_lzmat.exe" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="blocks\blocks.csproj">
+      <Project>{045B96F2-AF80-4C4C-8D27-E38635AC705E}</Project>
+      <Name>blocks</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <ItemGroup />
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>
