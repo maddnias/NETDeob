@@ -9,7 +9,7 @@ namespace NETDeob._Console
 {
     public class Program
     {
-        private const string Version = "0.3.0 - Private revision";
+        private const string Version = "0.3.0";
 
         [STAThread]
         private static void Main(string[] args)
