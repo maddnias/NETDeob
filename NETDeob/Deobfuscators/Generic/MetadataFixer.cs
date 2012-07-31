@@ -84,66 +84,40 @@ namespace NETDeob.Core.Deobfuscators.Generic
         }
         private static IEnumerable<object> AnalyzeResources()
         {
-            var outList = new List<object>();
-
             foreach (var res in AsmDef.MainModule.Resources)
             {
-                try
-                {
-                    var resStream = (res as EmbeddedResource).GetResourceStream();
-                    if (resStream.Length != 0 && res.Name.Length <= 1000) continue;
+                var resStream = (res as EmbeddedResource).GetResourceStream();
+                if (resStream.Length != 0 && res.Name.Length <= 1000) continue;
 
-                    Console.WriteLine("Found invalid resource...");
-                    outList.Add(res);
-                }
-                catch
-                {
-
-                    Console.WriteLine("Found invalid resource...");
-                    outList.Add(res);
-                }
+                Console.WriteLine("Found invalid resource...");
+                yield return res;
             }
-
-            return outList;
         }
+
         private static IEnumerable<object> AnalyzeSecurityDeclarations()
         {
-            var outList = new List<object>();
-            return outList;
+            yield return null;
         }
         private static IEnumerable<object> AnalyzeModules()
         {
-            var outList = new List<object>();
-
-            foreach (var modDef in AsmDef.Modules.Where(mod => mod != AsmDef.MainModule))
-                outList.Add(modDef);
-
-            return outList;
+            return AsmDef.Modules.Where(mod => mod != AsmDef.MainModule);
         }
+
         private static IEnumerable<object> AnalyzeTypeDefs()
         {
-            var outList = new List<object>();
-
             foreach (var typeDef in AsmDef.MainModule.Types)
             {
                 try
                 {
-                    for (int i = 0; i < typeDef.GenericParameters.Count; i++)
-                    {
-                        var gParam = typeDef.GenericParameters[i];
-
-                        if (gParam.Attributes == (GenericParameterAttributes) 0xffff)
-                            typeDef.GenericParameters.Remove(gParam);
-                    }
+                    foreach (var gParam in typeDef.GenericParameters)
+                        if (gParam.Attributes == (GenericParameterAttributes)0xffff)
+                            MarkMember(gParam);
                 }
                 catch {}
 
                 if (typeDef.Name.Length >= 1000)
-                    MarkMember(typeDef);
+                    yield return typeDef;
             }
-
-
-            return outList;
         }
     }
 }
