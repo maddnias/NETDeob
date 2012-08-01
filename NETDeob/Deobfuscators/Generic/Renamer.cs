@@ -106,7 +106,7 @@ namespace NETDeob.Core.Deobfuscators.Generic
                     #region Methods
 
                     if (_scheme.Methods)
-                        foreach (var mDef in typeDef.Methods.Where(mDef => mDef.HasBody && !mDef.IsRuntimeSpecialName))
+                        foreach (var mDef in typeDef.Methods.Where(mDef => !mDef.IsRuntimeSpecialName))
                         {
                             oldName = mDef.Name;
                             mDef.Name = "Method_" + mCount++;

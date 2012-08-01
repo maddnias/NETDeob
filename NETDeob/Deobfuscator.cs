@@ -19,8 +19,9 @@ namespace NETDeob.Core
                 AppDomain.CurrentDomain.UnhandledException += excHandler;
         }
 
-        public void Deobfuscate()
+        public void Deobfuscate(DynamicStringDecryptionContetx strCtx = null)
         {
+            DeobfuscatorContext.DynStringCtx = strCtx;
             TaskAssigner.AssignDeobfuscation(DeobfuscatorContext.AsmDef);
         }
 

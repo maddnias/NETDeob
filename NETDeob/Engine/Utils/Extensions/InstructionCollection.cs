@@ -72,6 +72,17 @@ namespace NETDeob.Core.Engine.Utils.Extensions
             return outList;
         }
 
+        public static IEnumerable<Instruction> SliceBlock(this Collection<Instruction> instrList, Instruction start, int count)
+        {
+            var curInstr = start.Next;
+
+            for (var i = ++count; i > 0; i--)
+            {
+                yield return curInstr.Previous;
+                curInstr = curInstr.Previous;
+            }
+        }
+
         public static List<Instruction> GetInstructionBlock(this Collection<Instruction> instructions, int startIndex, int count)
         {
             var outList = new List<Instruction>();

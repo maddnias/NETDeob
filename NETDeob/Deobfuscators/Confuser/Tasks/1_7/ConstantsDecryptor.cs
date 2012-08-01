@@ -271,7 +271,7 @@ namespace NETDeob.Deobfuscators.Confuser.Tasks._1_7
             ilProc.InsertAfter(badInstructions[2], ilProc.Create(OpCodes.Ldstr, entry.PlainText));
 
             foreach (var instr in badInstructions)
-                ilProc.Remove(instr);
+                MarkMember(instr, entry.Caller);
         }
 
         public IEnumerable<Confuser1_7Entry> ConstructEntries(object param)

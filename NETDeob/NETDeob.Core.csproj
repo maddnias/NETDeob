@@ -70,6 +70,7 @@
     <Compile Include="Deobfuscator.cs" />
     <Compile Include="Deobfuscators\Confuser\Tasks\1_7\ProxyResolver2.cs" />
     <Compile Include="Deobfuscators\Generic\MetadataFixer.cs" />
+    <Compile Include="Deobfuscators\Generic\GenericStringDecryptor.cs" />
     <Compile Include="Deobfuscators\HurpFuscator\HurpDeobfuscator.cs" />
     <Compile Include="Deobfuscators\HurpFuscator\Tasks\StringDecrypter2.cs" />
     <Compile Include="Deobfuscators\HurpFuscator\Tasks\StringDecryptor1.cs" />

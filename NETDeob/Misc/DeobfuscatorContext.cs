@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using Mono.Cecil;
 using NETDeob.Misc.Structs__Enums___Interfaces.Signatures;
@@ -18,6 +19,19 @@ namespace NETDeob.Core.Misc
         AssemblyReference = 128
     }
 
+    public enum StringDecryption
+    {
+        Explicit = 0,
+        Dynamic = 1,
+        DynamicBrute = 2
+    }
+
+    public class DynamicStringDecryptionContetx
+    {
+        public StringDecryption DecryptionType;
+        public List<int> AssociatedTokens;
+    }
+
     public class MarkedMember
     {
         public string ID;
@@ -34,7 +48,6 @@ namespace NETDeob.Core.Misc
 
     public static class DeobfuscatorContext
     {
-
         public enum OutputType
         {
             Subtle = 0,
@@ -48,6 +61,7 @@ namespace NETDeob.Core.Misc
         public static AssemblyDefinition AsmDef;
         public static List<MarkedMember> MarkedMembers = new List<MarkedMember>();
         public static List<ResEx> ResStreams = new List<ResEx>();
+        public static DynamicStringDecryptionContetx DynStringCtx;
 
         public static ISignature ActiveSignature;
     }

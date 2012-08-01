@@ -12,11 +12,26 @@ namespace NETDeob._Console.Utils
         }
     }
 
+    public class CmdDynamicStringDecryption : Command
+    {
+        public CmdDynamicStringDecryption()
+        {
+            Name = "Dynamic string decryption";
+            Description = "Dynamically decrypts strings using a MD token as input";
+            RawCommand = "-dtok";
+            Incompabilities = new List<Command>();
+        }
+
+        public override void Display(dynamic param)
+        {
+            throw new NotImplementedException();
+        }
+    }
     public class CmdDeobfuscateDirectory : Command
     {
         public CmdDeobfuscateDirectory()
         {
-            Name = "Deobfuscate Directory";
+            Name = "Deobfuscate directory";
             Description = "Tells NETDeob to deobfuscate all available files in specified dir";
             RawCommand = "-ddir";
             Incompabilities = new List<Command>();

@@ -43,7 +43,6 @@ namespace NETDeob.Core.Engine.Utils.Extensions
                    instr.OpCode == OpCodes.Ldc_I4_S;
         }
 
-
         public static bool IsTarget(this Instruction instr, MethodBody body)
         {
             return body.Instructions.Where(OnFunc).Any(instr1 => instr1.Operand as Instruction == instr);

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.IO;
 using System.Reflection;
 using System.Text;
@@ -23,6 +24,7 @@ namespace NETDeob._Console
         {
             var parser = new ArgumentParser(args);
             bool autoDeob;
+            int token;
 
             if(!parser.ParseRawInput()){
                 Console.ReadLine();
@@ -48,20 +50,27 @@ namespace NETDeob._Console
             Logger.VSLog("");
 
             DeobfuscatorContext.OutPath = DeobfuscatorContext.InPath + "_deobf.exe";
-            ActivateCommands(parser, out autoDeob);
+            ActivateCommands(parser, out autoDeob, out token);
 
             if (autoDeob)
             {
                 var deob = new Deobfuscator(Handler);
-                deob.Deobfuscate();
+                deob.Deobfuscate(token == 0
+                                     ? null
+                                     : new DynamicStringDecryptionContetx
+                                           {
+                                               AssociatedTokens = new List<int> { token },
+                                               DecryptionType = StringDecryption.Dynamic
+                                           });
             }
 
             Console.Read();
         }
 
-        private static void ActivateCommands(ArgumentParser parser, out bool autoDeob)
+        private static void ActivateCommands(ArgumentParser parser, out bool autoDeob, out int token)
         {
             autoDeob = true;
+            token = 0;
 
             foreach(var cmd in parser.ParsedCommands)
             {
@@ -75,6 +84,10 @@ namespace NETDeob._Console
                     var deob = new Deobfuscator(null);
 
                     Logger.VSLog(deob.FetchSignature());
+                }
+                if(cmd is CmdDynamicStringDecryption)
+                {
+                    token = Int32.Parse(cmd.UserInput.Split(':')[1].Trim(), NumberStyles.HexNumber);
                 }
             }
         }
