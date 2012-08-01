@@ -150,9 +150,9 @@ namespace NETDeob.Core.Deobfuscators.Generic
         {
             var ilProc = entry.Source.Body.GetILProcessor();
 
-            ilProc.Replace(entry.BadInstructions[0], ilProc.Create(OpCodes.Ldstr, entry.PlainText));
+            ilProc.InsertBefore(entry.BadInstructions[0], ilProc.Create(OpCodes.Ldstr, entry.PlainText));
 
-            for (var i = 1; i < entry.BadInstructions.Count; i++)
+            for (var i = 0; i < entry.BadInstructions.Count; i++)
                 MarkMember(entry.BadInstructions[i], entry.Source);
         }
         public IEnumerable<GenericDecryptionContext> ConstructEntries(object param)
