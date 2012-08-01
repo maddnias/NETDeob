@@ -51,7 +51,7 @@ namespace NETDeob.Core.Engine.Utils.Extensions
 
         private static bool OnFunc(Instruction instr)
         {
-            return instr.IsUnconditionalJump();
+            return instr.IsUnconditionalBranch();
         }
 
         public static int GetLdcI4(this Instruction instr)
@@ -103,7 +103,7 @@ namespace NETDeob.Core.Engine.Utils.Extensions
 
         }
 
-        public static bool IsUnconditionalJump(this Instruction instr)
+        public static bool IsUnconditionalBranch(this Instruction instr)
         {
             return
                 instr.OpCode == OpCodes.Br ||
@@ -113,7 +113,7 @@ namespace NETDeob.Core.Engine.Utils.Extensions
                 instr.OpCode == OpCodes.Leave;
         }
 
-        public static bool IsConditionalJump(this Instruction instr)
+        public static bool IsConditionalBranch(this Instruction instr)
         {
             return
                 instr.OpCode == OpCodes.Brtrue ||

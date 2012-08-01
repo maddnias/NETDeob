@@ -129,7 +129,7 @@ namespace NETDeob.Core.Deobfuscators.Generic.Obsolete
         private static void CleanJumps(ref List<Instruction> instrList)
         {
             for (var i = 0; i < instrList.Count; i++)
-                if (instrList[i].IsUnconditionalJump())
+                if (instrList[i].IsUnconditionalBranch())
                     if ((instrList[i].Operand as Instruction) == instrList[i +1]) // No need for an un.jump 1 instruction forward. :)
                         instrList.RemoveAt(i);
         }

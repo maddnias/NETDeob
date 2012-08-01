@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Reflection;
 using System.Text;
@@ -21,13 +22,13 @@ namespace NETDeob._Console
         private static void Main(string[] args)
         {
             var parser = new ArgumentParser(args);
+            bool autoDeob;
 
             if(!parser.ParseRawInput()){
                 Console.ReadLine();
                 Environment.Exit(-1);
             }
 
-            ActivateCommands(parser);
             AssemblyDefinition tmpAsm = null;
 
             try
@@ -41,27 +42,40 @@ namespace NETDeob._Console
                 Environment.Exit(-1);
             }
 
-            DeobfuscatorContext.OutPath = DeobfuscatorContext.InPath + "_deobf.exe";
             DeobfuscatorContext.AsmDef = tmpAsm;
 
             Logger.VSLog(string.Concat("NETDeob ", Version, " BETA"));
             Logger.VSLog("");
 
-            var deob = new Deobfuscator(Handler);
+            DeobfuscatorContext.OutPath = DeobfuscatorContext.InPath + "_deobf.exe";
+            ActivateCommands(parser, out autoDeob);
 
-            deob.Deobfuscate(tmpAsm);
+            if (autoDeob)
+            {
+                var deob = new Deobfuscator(Handler);
+                deob.Deobfuscate();
+            }
 
             Console.Read();
         }
 
-        private static void ActivateCommands(ArgumentParser parser)
+        private static void ActivateCommands(ArgumentParser parser, out bool autoDeob)
         {
+            autoDeob = true;
+
             foreach(var cmd in parser.ParsedCommands)
             {
                 if (cmd is CmdVerbose)
                     DeobfuscatorContext.Output = DeobfuscatorContext.OutputType.Verbose;
                 if (cmd is CmdOut)
                     DeobfuscatorContext.OutPath = cmd.UserInput.Substring(1);
+                if (cmd is CmdFetchSignature)
+                {
+                    autoDeob = false;
+                    var deob = new Deobfuscator(null);
+
+                    Logger.VSLog(deob.FetchSignature());
+                }
             }
         }
 

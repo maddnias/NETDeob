@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 using Mono.Cecil;
-using NETDeob.Deobfuscators.Confuser.Tasks.Utils;
+using NETDeob.Core.Deobfuscators.Confuser.Obsolete.Utils;
 using NETDeob.Misc.Structs__Enums___Interfaces.Deobfuscation;
 
 namespace NETDeob.Deobfuscators.Confuser.Obsolete

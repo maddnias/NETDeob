@@ -15,24 +15,24 @@ using NETDeob.Core.Engine.Utils.Extensions;
 
 namespace NETDeob.Deobfuscators.Confuser.Tasks._1_7
 {
-    class ConstantsDecryptor : AssemblyDeobfuscationTask, IStringDecryptor
+    public class Confuser1_7Entry : DecryptionContext
+    {
+        public MethodDefinition Caller;
+
+        public int Id;
+        public uint MDToken;
+
+        public IEnumerable<Instruction> BadInstructions;
+
+        public override string ToString()
+        {
+            return string.Format(@"[Decrypt] ""({0})"" -> ""{1}""", Id, PlainText);
+        }
+    }
+
+    class ConstantsDecryptor : AssemblyDeobfuscationTask, IStringDecryptor<Confuser1_7Entry>
     {
         public static int[] Modifiers;
-
-        public class Confuser1_7Entry : DecryptionContext
-        {
-            public MethodDefinition Caller;
-
-            public int Id;
-            public uint MDToken;
-
-            public IEnumerable<Instruction> BadInstructions;
-
-            public override string ToString()
-            {
-                return string.Format(@"[Decrypt] ""({0})"" -> ""{1}""", Id, PlainText);
-            }
-        }
 
         private const int BufSize = 4096;
         private static byte[] _rawData;
@@ -44,9 +44,9 @@ namespace NETDeob.Deobfuscators.Confuser.Tasks._1_7
         }
 
         [DeobfuscationPhase(1, "Locate decryption method")]
-        public static bool Phase1()
+        public bool Phase1()
         {
-            var decryptor = AsmDef.FindMethod(IsDecryptor);
+            var decryptor = AsmDef.FindMethod(m => BaseIsDecryptor(m));
 
             if(decryptor == null){
                 ThrowPhaseError("No string encryption?", 0, true);
@@ -128,7 +128,7 @@ namespace NETDeob.Deobfuscators.Confuser.Tasks._1_7
         [DeobfuscationPhase(3, "Construct decryption entries")]
         public bool Phase3()
         {
-            var decEntries = ConstructEntries<Confuser1_7Entry>(null).ToList();
+            var decEntries = ConstructEntries(null).ToList();
             PhaseParam = new object[] {decEntries, PhaseParam[1]};
 
             Logger.VSLog(string.Format("{0} decryption entries constructed...", decEntries.Count));
@@ -144,9 +144,9 @@ namespace NETDeob.Deobfuscators.Confuser.Tasks._1_7
             var decEntries = PhaseParam[0];
             InitializeDecryption(PhaseParam[1]);
 
-            foreach (DecryptionContext entry in decEntries)
+            foreach (var entry in decEntries)
             {
-                var e = entry;
+                var e = entry as Confuser1_7Entry;
                 DecryptEntry(ref e);
 
                 Logger.VLog(entry.ToString());
@@ -174,8 +174,10 @@ namespace NETDeob.Deobfuscators.Confuser.Tasks._1_7
             return true;
         }
 
-        public static bool IsDecryptor(MethodDefinition mDef)
+        public bool BaseIsDecryptor(params object[] param)
         {
+            var mDef = param[0] as MethodDefinition;
+
             if (!mDef.HasBody)
                 return false;
 
@@ -202,10 +204,10 @@ namespace NETDeob.Deobfuscators.Confuser.Tasks._1_7
             Modifiers[2] = mDef.Body.Instructions.GetOperandAt<int>(OpCodes.Ldc_I4, 5);
             Modifiers[3] = mDef.Body.Instructions.GetOperandAt<int>(OpCodes.Ldc_I4, 12);
         }
-        public void DecryptEntry(ref DecryptionContext entry)
+
+        public void DecryptEntry(ref Confuser1_7Entry entry)
         {
-            object obj2;
-            uint num3 = (uint)Modifiers[0] ^ (entry as Confuser1_7Entry).MDToken;
+            uint num3 = (uint)Modifiers[0] ^ entry.MDToken;
             uint num4 = (uint)Modifiers[1];
             uint num5 = (uint)Modifiers[2];
 
@@ -239,8 +241,7 @@ namespace NETDeob.Deobfuscators.Confuser.Tasks._1_7
                 }
             }
 
-            // I think this is constant
-            uint key = num3 ^ (uint)(entry as Confuser1_7Entry).Id;
+            uint key = num3 ^ (uint)entry.Id;
 
             using (BinaryReader reader = new BinaryReader(new MemoryStream(_rawData)))
             {
@@ -261,19 +262,21 @@ namespace NETDeob.Deobfuscators.Confuser.Tasks._1_7
                 entry.PlainText = Encoding.UTF8.GetString(bytes);
             }
         }
-        public void ProcessEntry(DecryptionContext entry)
+
+        public void ProcessEntry(Confuser1_7Entry entry)
         {
-            var ilProc = (entry as Confuser1_7Entry).Caller.Body.GetILProcessor();
-            var badInstructions = (entry as Confuser1_7Entry).BadInstructions.ToArray();
+            var ilProc = entry.Caller.Body.GetILProcessor();
+            var badInstructions = entry.BadInstructions.ToArray();
 
             ilProc.InsertAfter(badInstructions[2], ilProc.Create(OpCodes.Ldstr, entry.PlainText));
 
             foreach (var instr in badInstructions)
                 ilProc.Remove(instr);
         }
-        public IEnumerable<T> ConstructEntries<T>(object param) where T : DecryptionContext
+
+        public IEnumerable<Confuser1_7Entry> ConstructEntries(object param)
         {
-            foreach (var mDef in AsmDef.FindMethods(m => true).Where(mDef => !IsDecryptor(mDef)))
+            foreach (var mDef in AsmDef.FindMethods(m => true).Where(mDef => !BaseIsDecryptor(mDef)))
             {
                 if (!mDef.HasBody)
                     continue;
@@ -286,7 +289,7 @@ namespace NETDeob.Deobfuscators.Confuser.Tasks._1_7
                         continue;
 
                     if (instr.OpCode != OpCodes.Call || instr.Previous.OpCode != OpCodes.Ldc_I4 ||
-                        !IsDecryptor((instr.Operand as MethodReference).Resolve())) continue;
+                        !BaseIsDecryptor((instr.Operand as MethodReference).Resolve())) continue;
 
                     var entry = new Confuser1_7Entry
                     {
@@ -296,7 +299,7 @@ namespace NETDeob.Deobfuscators.Confuser.Tasks._1_7
                         BadInstructions = mDef.Body.Instructions.GetInstructionBlock(i - 1, 3),
                     };
 
-                    yield return entry as T;
+                    yield return entry;
                 }
             }
         }

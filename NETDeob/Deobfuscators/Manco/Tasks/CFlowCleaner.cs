@@ -62,7 +62,7 @@ namespace NETDeob.Core.Deobfuscators.Manco.Tasks
         }
         public void RemoveBranch(MethodDefinition mDef, Instruction instr)
         {
-            if (!instr.Next.IsConditionalJump())
+            if (!instr.Next.IsConditionalBranch())
                 return;
 
             mDef.Body.GetILProcessor().RemoveBlock(instr, instr.Next.Operand as Instruction); // load bool (ldsfld) -> branch target

@@ -16,7 +16,8 @@ namespace NETDeob._Console.Utils
                                              {
                                                  new CmdVerbose(),
                                                  new CmdHelp(),
-                                                 new CmdOut()
+                                                 new CmdOut(),
+                                                 new CmdFetchSignature()
                                              };
 
         public List<Command> ParsedCommands { get; private set; }

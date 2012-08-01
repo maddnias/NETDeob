@@ -3,12 +3,9 @@ using System.Collections.Generic;
 using System.Reflection.Emit;
 using Mono.Cecil.Cil;
 using NETDeob.Core.Engine.Utils.Extensions;
-using NETDeob.Core.Misc;
-using NETDeob.Misc;
 using OpCode = System.Reflection.Emit.OpCode;
-using OpCodes = Mono.Cecil.Cil.OpCodes;
 
-namespace NETDeob.Deobfuscators.Confuser.Tasks.Utils
+namespace NETDeob.Core.Deobfuscators.Confuser.Obsolete.Utils
 {
     public struct ExInstruction
     {

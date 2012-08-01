@@ -86,7 +86,7 @@
     <Compile Include="Deobfuscators\Confuser\Tasks\1_7\AntiDump.cs" />
     <Compile Include="Deobfuscators\Confuser\Tasks\1_7\AntiILDasm.cs" />
     <Compile Include="Deobfuscators\Confuser\Tasks\1_7\ConstantsDecryptor.cs" />
-    <Compile Include="Deobfuscators\Confuser\Tasks\1_7\ProxyResolver.cs" />
+    <Compile Include="Deobfuscators\Confuser\Obsolete\ProxyResolver.cs" />
     <Compile Include="Deobfuscators\Confuser\Tasks\1_7\ResourceDecryptor.cs" />
     <Compile Include="Deobfuscators\Confuser\Tasks\1_7\StackUnderflowRemover.cs" />
     <Compile Include="Deobfuscators\Confuser\Tasks\1_7\Unpacker.cs" />
