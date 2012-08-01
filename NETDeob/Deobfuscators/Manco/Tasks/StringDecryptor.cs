@@ -51,7 +51,7 @@ namespace NETDeob.Core.Deobfuscators.Manco.Tasks
         [DeobfuscationPhase(1, "Locating decryptor method")]
         public bool Phase1()
         {
-            var targetType = AsmDef.MainModule.GetAllTypes().FirstOrDefault(BaseIsDecryptor);
+            var targetType = AsmDef.MainModule.GetAllTypes().FirstOrDefault(t => BaseIsDecryptor(t));
             _decryptor = ExtractDecryptor(targetType, out _key, out _strAlgo);
 
             if (_decryptor == null)
@@ -266,9 +266,9 @@ namespace NETDeob.Core.Deobfuscators.Manco.Tasks
                     Previous.Operand as string;
         }
 
-        public bool BaseIsDecryptor(object param)
+        public bool BaseIsDecryptor(params object[] param)
         {
-            var cctor = (param as TypeDefinition).GetStaticConstructor();
+            var cctor = (param[0] as TypeDefinition).GetStaticConstructor();
 
             if (cctor == null)
                 return false;

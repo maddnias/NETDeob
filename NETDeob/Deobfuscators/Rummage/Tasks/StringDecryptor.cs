@@ -15,24 +15,24 @@ using NETDeob.Core.Engine.Utils.Extensions;
 
 namespace NETDeob.Core.Deobfuscators.Rummage.Tasks
 {
-    public class RummageStringDecryptor : AssemblyDeobfuscationTask, IStringDecryptor
+    public class RummageContext : DecryptionContext
     {
-        public class RummageEntry : DecryptionContext
+        public MethodDefinition SourceMethod;
+        public Instruction Source;
+
+        public FieldDefinition TargetField;
+        public int Key;
+
+        public override string ToString()
         {
-            public MethodDefinition SourceMethod;
-            public Instruction Source;
-
-            public FieldDefinition TargetField;
-            public int Key;
-
-            public override string ToString()
-            {
-                return string.Format(@"[Decrypt] ""{0}({1})"" -> ""{2}""", TargetField.Name,
-                                     Key,
-                                     PlainText);
-            }
+            return string.Format(@"[Decrypt] ""{0}({1})"" -> ""{2}""", TargetField.Name,
+                                 Key,
+                                 PlainText);
         }
+    }
 
+    public class RummageStringDecryptor : AssemblyDeobfuscationTask, IStringDecryptor<RummageContext>
+    {
         public RummageStringDecryptor(AssemblyDefinition asmDef)
             : base(asmDef)
         {
@@ -46,8 +46,10 @@ namespace NETDeob.Core.Deobfuscators.Rummage.Tasks
             var target =
                 AsmDef.FindMethod(
                     mDef =>
-                    mDef.Body.Instructions.GetOpCodeCount(OpCodes.Xor) == 4 && (mDef.Body.Variables.Count == 11) &&
-                    mDef.Parameters.Count == 1);
+                    mDef.Body.Instructions.GetOpCodeCount(OpCodes.Xor) == 4 && 
+                    mDef.Body.Variables.Count == 10 &&
+                    mDef.Parameters.Count == 1 &&
+                    mDef.Parameters[0].ParameterType.ToString().Contains("Int32"));
 
             if (target == null)
             {
@@ -66,7 +68,7 @@ namespace NETDeob.Core.Deobfuscators.Rummage.Tasks
         public bool Phase2()
         {
             var decMethod = PhaseParam as MethodDefinition;
-            var decEntries = ConstructEntries<RummageEntry>(decMethod).ToList();
+            var decEntries = ConstructEntries(decMethod).ToList();
 
             PhaseParam = new object[] {decMethod, decEntries};
             Logger.VSLog(string.Format("Constructed {0} decryption entries...", decEntries.Count));
@@ -77,12 +79,12 @@ namespace NETDeob.Core.Deobfuscators.Rummage.Tasks
         [DeobfuscationPhase(3, "Decrypt strings")]
         public bool Phase3()
         {
-            var decEntries = PhaseParam[1] as List<RummageEntry>;
+            var decEntries = PhaseParam[1] as List<RummageContext>;
             var decMethod = PhaseParam[0] as MethodDefinition;
 
             InitializeDecryption(decMethod.Body.Instructions.GetOperandAt<int>(OpCodes.Ldc_I4, 0));
 
-            for (int i = 0; i < decEntries.Count; i++)
+            for (var i = 0; i < decEntries.Count; i++)
             {
                 var t = decEntries[i] as DecryptionContext;
 
@@ -126,10 +128,36 @@ namespace NETDeob.Core.Deobfuscators.Rummage.Tasks
             return true;
         }
 
-        public static bool IsBadType(TypeDefinition type, MethodDefinition target)
+        //public static bool IsBadType(TypeDefinition type, MethodDefinition target)
+        //{
+        //    MethodDefinition cctor;
+        //    Instruction source;
+
+        //    if ((cctor = type.GetStaticConstructor()) == null)
+        //        return false;
+
+        //    if (type.Fields.Count != 1)
+        //        return false;
+
+        //    if ((source = cctor.Body.Instructions.FirstOrDefault(instr => instr.OpCode == OpCodes.Call)) == null)
+        //        return false;
+
+        //    if ((source.Operand as MethodReference).Resolve() != target)
+        //        return false;
+
+        //    return true;
+        //}
+
+        private static UInt32[] _decMod;
+        private static int _offset;
+
+        public bool BaseIsDecryptor(params object[] param)
         {
             MethodDefinition cctor;
             Instruction source;
+
+            var type = param[0] as TypeDefinition;
+            var target = param[1] as MethodDefinition;
 
             if ((cctor = type.GetStaticConstructor()) == null)
                 return false;
@@ -145,9 +173,6 @@ namespace NETDeob.Core.Deobfuscators.Rummage.Tasks
 
             return true;
         }
-
-        private static UInt32[] _decMod;
-        private static int _offset;
 
         public void InitializeDecryption(object param)
         {
@@ -170,9 +195,46 @@ namespace NETDeob.Core.Deobfuscators.Rummage.Tasks
             }
         }
 
+        public void DecryptEntry(ref RummageContext entry)
+        {
+            throw new NotImplementedException();
+        }
+
+        public void ProcessEntry(RummageContext entry)
+        {
+            var rEntry = entry;
+
+            var ilProc = rEntry.SourceMethod.Body.GetILProcessor();
+            ilProc.Replace(rEntry.Source, ilProc.Create(OpCodes.Ldstr, rEntry.PlainText));
+        }
+
+        public IEnumerable<RummageContext> ConstructEntries(object param)
+        {
+            foreach (var mDef in AsmDef.FindMethods(method => method.HasBody))
+                foreach (var instr in mDef.Body.Instructions)
+                    if (instr.OpCode == OpCodes.Ldsfld)
+                    {
+                        if (BaseIsDecryptor((instr.Operand as FieldReference).Resolve().DeclaringType,
+                                      param as MethodDefinition))
+                        {
+                            var tmpEntry = new RummageContext
+                            {
+                                SourceMethod = mDef,
+                                Source = instr,
+                                TargetField = instr.Operand as FieldDefinition
+                            };
+
+                            var target = (instr.Operand as FieldDefinition).DeclaringType.GetStaticConstructor();
+                            tmpEntry.Key = target.Body.Instructions.First(iinstr => iinstr.IsLdcI4()).GetLdcI4();
+
+                            yield return tmpEntry;
+                        }
+                    }
+        }
+
         public void DecryptEntry(ref DecryptionContext entry)
         {
-            var rEntry = entry as RummageEntry;
+            var rEntry = entry as RummageContext;
 
             if (rEntry.Key == 0)
                 ThrowPhaseError("Failed to decrypt string!", 0, false);
@@ -254,37 +316,35 @@ namespace NETDeob.Core.Deobfuscators.Rummage.Tasks
 
             rEntry.PlainText = str;
         }
+        //public void ProcessEntry(DecryptionContext entry)
+        //{
+        //    var rEntry = entry as RummageContext;
 
-        public void ProcessEntry(DecryptionContext entry)
-        {
-            var rEntry = entry as RummageEntry;
+        //    var ilProc = rEntry.SourceMethod.Body.GetILProcessor();
+        //    ilProc.Replace(rEntry.Source, ilProc.Create(OpCodes.Ldstr, rEntry.PlainText));
+        //}
+        //public IEnumerable<T> ConstructEntries<T>(object param) where T : DecryptionContext
+        //{
+        //    foreach (var mDef in AsmDef.FindMethods(method => method.HasBody))
+        //        foreach (var instr in mDef.Body.Instructions)
+        //            if (instr.OpCode == OpCodes.Ldsfld)
+        //            {
+        //                if (BaseIsDecryptor((instr.Operand as FieldReference).Resolve().DeclaringType,
+        //                              param as MethodDefinition))
+        //                {
+        //                    var tmpEntry = new RummageContext
+        //                                       {
+        //                                           SourceMethod = mDef,
+        //                                           Source = instr,
+        //                                           TargetField = instr.Operand as FieldDefinition
+        //                                       };
 
-            var ilProc = rEntry.SourceMethod.Body.GetILProcessor();
-            ilProc.Replace(rEntry.Source, ilProc.Create(OpCodes.Ldstr, rEntry.PlainText));
-        }
+        //                    var target = (instr.Operand as FieldDefinition).DeclaringType.GetStaticConstructor();
+        //                    tmpEntry.Key = target.Body.Instructions.First(iinstr => iinstr.IsLdcI4()).GetLdcI4();
 
-        public IEnumerable<T> ConstructEntries<T>(object param) where T : DecryptionContext
-        {
-            foreach (var mDef in AsmDef.FindMethods(method => method.HasBody))
-                foreach (var instr in mDef.Body.Instructions)
-                    if (instr.OpCode == OpCodes.Ldsfld)
-                    {
-                        if (IsBadType((instr.Operand as FieldReference).Resolve().DeclaringType,
-                                      param as MethodDefinition))
-                        {
-                            var tmpEntry = new RummageEntry
-                                               {
-                                                   SourceMethod = mDef,
-                                                   Source = instr,
-                                                   TargetField = instr.Operand as FieldDefinition
-                                               };
-
-                            var target = (instr.Operand as FieldDefinition).DeclaringType.GetStaticConstructor();
-                            tmpEntry.Key = target.Body.Instructions.First(iinstr => iinstr.IsLdcI4()).GetLdcI4();
-
-                            yield return (T) Convert.ChangeType(tmpEntry, typeof (T));
-                        }
-                    }
-        }
+        //                    yield return (T) Convert.ChangeType(tmpEntry, typeof (T));
+        //                }
+        //            }
+        //}
     }
 }

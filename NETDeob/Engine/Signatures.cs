@@ -3,6 +3,7 @@ using NETDeob.Core.Deobfuscators.Confuser;
 using NETDeob.Core.Deobfuscators.HurpFuscator;
 using NETDeob.Core.Deobfuscators.Manco;
 using NETDeob.Core.Deobfuscators.Obfusasm;
+using NETDeob.Core.Deobfuscators.Rummage;
 using NETDeob.Core.Deobfuscators.Unidentified;
 using NETDeob.Core.Unpackers.ExePack;
 using NETDeob.Core.Unpackers.Mpress;
@@ -13,8 +14,6 @@ using NETDeob.Core.Unpackers.Sixxpack;
 using NETDeob.Deobfuscators.CodeFort;
 using NETDeob.Deobfuscators.CodeWall;
 using NETDeob.Deobfuscators.Phoenix_Protector;
-using NETDeob.Deobfuscators.Rummage;
-
 using NETDeob.Misc.Structs__Enums___Interfaces.Signatures;
 
 namespace NETDeob.Core.Engine

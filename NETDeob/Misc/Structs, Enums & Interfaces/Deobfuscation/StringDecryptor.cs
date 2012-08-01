@@ -14,7 +14,7 @@ namespace NETDeob.Misc.Structs__Enums___Interfaces.Deobfuscation
 
     public interface IStringDecryptor<T> where T : DecryptionContext
     {
-        bool BaseIsDecryptor(object param);
+        bool BaseIsDecryptor(params object[] param);
         void InitializeDecryption(object param);
         void DecryptEntry(ref T entry);
         void ProcessEntry(T entry);

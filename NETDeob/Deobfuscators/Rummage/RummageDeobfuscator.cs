@@ -1,13 +1,16 @@
-﻿using Mono.Cecil;
+﻿using System.Linq;
+using Mono.Cecil;
 using NETDeob.Core.Deobfuscators.Generic;
 using NETDeob.Core.Deobfuscators.Rummage.Tasks;
-using NETDeob.Deobfuscators.Generic;
+using NETDeob.Core.Engine.Utils.Extensions;
 using NETDeob.Misc.Structs__Enums___Interfaces;
 
-namespace NETDeob.Deobfuscators.Rummage
+namespace NETDeob.Core.Deobfuscators.Rummage
 {
     class RummageDeobfuscator : AssemblyWorker
     {
+        //TODO: Find out why this leave some unreferenced types in the assembly...
+
         public RummageDeobfuscator(AssemblyDefinition asmDef)
             : base(asmDef)
         {
@@ -18,7 +21,7 @@ namespace NETDeob.Deobfuscators.Rummage
             TaskQueue.Add(new MethodCleaner2(AsmDef));
             TaskQueue.Add(new RummageStringDecryptor(AsmDef));
             TaskQueue.Add(new Renamer(AsmDef, new RenamingScheme(true)));
-            
+
             Deobfuscate();
         }
     }
