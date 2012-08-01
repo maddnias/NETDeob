@@ -12,5 +12,34 @@ namespace NETDeob.Core.Engine.Utils.Extensions
         {
             return ((dynamic) member1).Resolve() == member2;
         }
+
+        public static int CalcChildMembers(this object parentMember)
+        {
+            var outNum = 0;
+
+            if (parentMember is TypeDefinition)
+            {
+                var tDef = parentMember as TypeDefinition;
+
+                outNum += tDef.NestedTypes.Sum(nestedType => CalcChildMembers(nestedType));
+                outNum += tDef.Methods.Count;
+                outNum += tDef.Fields.Count;
+                outNum += tDef.Events.Count;
+                outNum += tDef.Properties.Sum(propDef => CalcChildMembers(propDef));
+            }
+
+            if(parentMember is PropertyDefinition)
+            {
+                var pDef = parentMember as PropertyDefinition;
+
+                if (pDef.GetMethod != null)
+                    outNum++;
+
+                if (pDef.SetMethod != null)
+                    outNum++;
+            }
+
+            return (outNum == 0 ? 1 : outNum);
+        }
     }
 }

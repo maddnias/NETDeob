@@ -84,8 +84,11 @@ namespace NETDeob.Core.Deobfuscators.Generic
 
                 foreach (
                     var typeDef in
-                        modDef.Types.Where(
-                            tDef => !tDef.IsRuntimeSpecialName && !tDef.IsSpecialName && !(tDef.Name.StartsWith("<") && tDef.Name.EndsWith(">"))))
+                        modDef.GetAllTypes().Where(
+                            tDef => 
+                                !tDef.IsRuntimeSpecialName &&
+                                !tDef.IsSpecialName &&
+                                !(tDef.Name.StartsWith("<") && tDef.Name.EndsWith(">"))))
                 {
                     oldName = typeDef.Name;
 

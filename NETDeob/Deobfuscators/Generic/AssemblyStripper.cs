@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using Mono.Cecil;
 using Mono.Cecil.Cil;
 using NETDeob.Core.Engine.Utils;
@@ -92,7 +93,9 @@ namespace NETDeob.Core.Deobfuscators.Generic
                 ThrowPhaseError("Failed to clean up member!", 0, false);
             }
 
-            Logger.VSLog(string.Format("{0} members cleaned from assembly...", DeobfuscatorContext.MarkedMembers.Count));
+            var totalNum = DeobfuscatorContext.MarkedMembers.Sum(member => member.Member.CalcChildMembers());
+
+            Logger.VSLog(string.Format("{0} members cleaned from assembly...", totalNum));
             return true;
         }
     }
