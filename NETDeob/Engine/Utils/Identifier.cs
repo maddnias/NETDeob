@@ -32,6 +32,7 @@ namespace NETDeob.Core.Engine.Utils
 
         public static ISignature Identify(AssemblyDefinition asmDef)
         {
+            return new Signatures.UnidentifiedSignature();
             foreach (var task in IdentifierTasks)
             {
                 bool found;

@@ -55,8 +55,9 @@ namespace NETDeob.Core.Deobfuscators.Generic
                     _stack.Push(new StackEntry(instruction, null));
                     break;
             }
-            if (instruction.OpCode.OperandType == OperandType.InlineBrTarget ||
-                instruction.OpCode.OperandType == OperandType.ShortInlineBrTarget)
+            if ((instruction.OpCode.OperandType == OperandType.InlineBrTarget ||
+                instruction.OpCode.OperandType == OperandType.ShortInlineBrTarget) && 
+                (instruction.OpCode == OpCodes.Br || instruction.OpCode == OpCodes.Br_S))
             {
                 return _methodBody.Instructions.IndexOf(instruction);
             }

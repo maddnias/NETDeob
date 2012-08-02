@@ -49,7 +49,7 @@ namespace NETDeob.Core.Deobfuscators.Generic
             }
             for (int i = 0; i < Target.ParameterCount; i++)
             {
-                yield return reverseStack.Pop();
+                yield return reverseStack.Pop().Value;
             }
         }
 
