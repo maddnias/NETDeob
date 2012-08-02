@@ -15,8 +15,8 @@ namespace NETDeob.Core
         public Deobfuscator(UnhandledExceptionEventHandler excHandler)
         {
             // To keep NETDeob from crashing when an exception occurs
-            //if(excHandler != null)
-              //  AppDomain.CurrentDomain.UnhandledException += excHandler;
+            if(excHandler != null)
+                AppDomain.CurrentDomain.UnhandledException += excHandler;
         }
 
         public void Deobfuscate(DynamicStringDecryptionContetx strCtx = null)
