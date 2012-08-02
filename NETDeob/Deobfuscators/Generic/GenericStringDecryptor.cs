@@ -35,25 +35,17 @@ namespace NETDeob.Core.Deobfuscators.Generic
 
         public IEnumerable<object> FetchParameters()
         {
-            var @params = FetchParametersNormalWay();
-
-            // lets try another method
-            var tracer = new StackTracer(Source.Body);
-
-            tracer.TraceUntil(BadInstructions[0]);
-            var reverseStack = new Stack<StackTracer.StackEntry>();
-
-            for (var i = 0 ; i < Target.ParameterCount ; i++)
-                reverseStack.Push(tracer.Stack.Pop());
-            for (var i = 0; i < Target.ParameterCount; i++)
-                yield return reverseStack.Pop().Value;
+            var @params = FetchParametersInternal();
+            return @params.Reverse();
         }
 
-        private IEnumerable<object> FetchParametersNormalWay()
+        private IEnumerable<object> FetchParametersInternal()
         {
             foreach (var instr in BadInstructions)
                 if (instr.IsLdcI4())
-                    yield return instr.GetLdcI4();
+                    yield return instr.GetLdcI4().OptimizeValue();
+                else if (instr.IsLdcI8WOperand())
+                    yield return instr.GetLdcI8().OptimizeValue();
                 else if (instr.OpCode == OpCodes.Ldstr)
                     yield return instr.Operand as string;
         }

@@ -53,6 +53,14 @@ namespace NETDeob.Core.Engine.Utils.Extensions
             return instr.IsUnconditionalBranch();
         }
 
+        public static long GetLdcI8(this Instruction instr)
+        {
+            if (instr.OpCode.Code != Code.Ldc_I8)
+                throw new InvalidProgramException("instr not long");
+
+            return (long)instr.Operand;
+        }
+
         public static int GetLdcI4(this Instruction instr)
         {
             switch (instr.OpCode.Code)
