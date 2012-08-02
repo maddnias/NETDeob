@@ -11,9 +11,9 @@ using NETDeob.Core.Misc;
 using NETDeob.Deobfuscators;
 using NETDeob.Misc.Structs__Enums___Interfaces.Deobfuscation;
 
-namespace NETDeob.Core.Deobfuscators.HurpFuscator.Tasks
+namespace NETDeob.Core.Deobfuscators.HurpFuscator.Tasks._1_0
 {
-    internal class StringDecryptor1 : AssemblyDeobfuscationTask, IStringDecryptor
+    internal class StringDecryptor : AssemblyDeobfuscationTask, IStringDecryptor
     {
         public class HurpFuscatorEntry : DecryptionContext
         {
@@ -27,7 +27,7 @@ namespace NETDeob.Core.Deobfuscators.HurpFuscator.Tasks
             }
         }
 
-        public StringDecryptor1(AssemblyDefinition asmDef)
+        public StringDecryptor(AssemblyDefinition asmDef)
             : base(asmDef)
         {
         }

@@ -23,9 +23,9 @@ namespace NETDeob.Core.Deobfuscators.HurpFuscator
             TaskQueue.Add(new MetadataFixer(AsmDef));
 
             if(DeobfuscatorContext.ActiveSignature.Ver.Major == 1 && DeobfuscatorContext.ActiveSignature.Ver.Minor == 0)
-                TaskQueue.Add(new StringDecryptor1(AsmDef));
+                TaskQueue.Add(new Tasks._1_0.StringDecryptor(AsmDef));
             else
-                TaskQueue.Add(new StringDecryptor2(AsmDef));
+                TaskQueue.Add(new Tasks._1_1.StringDecryptor(AsmDef));
 
             TaskQueue.Add(new Renamer(AsmDef, new RenamingScheme(true)));
             Deobfuscate();
