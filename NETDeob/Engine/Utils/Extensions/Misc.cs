@@ -15,6 +15,8 @@ namespace NETDeob.Core.Engine.Utils.Extensions
 
             if (_val >= byte.MinValue && _val <= byte.MaxValue)
                 return (byte)_val;
+            if (_val >= byte.MaxValue && _val <= Int32.MaxValue)
+                return (int)_val;
 
             return _val;
         }

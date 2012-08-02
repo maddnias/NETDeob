@@ -52,7 +52,9 @@ namespace NETDeob.Core.Deobfuscators.Generic
 
         public override string ToString()
         {
-            return string.Format(@"[Decrypt] {0} -> ""{1}""", Source.Name, PlainText);
+            return string.Format(@"[Decrypt] ({0}) -> ""{1}""",
+                                 FetchParameters().Aggregate("", (current, param) => current + param.ToString() + ", ").TrimEnd(new[] { ',', ' '}),
+                                 PlainText);
         }
     }
 
@@ -77,6 +79,11 @@ namespace NETDeob.Core.Deobfuscators.Generic
             }
 
             decMethods.ForEach(dm => Logger.VSLog("Found decryptor method at " + dm.Method.Name));
+            Logger.VLog(string.Format("Detected {0} parameters: ({1})", decMethods[0].ParameterCount,
+                                      decMethods[0].Method.Parameters.Aggregate("",
+                                                                                (current, param) =>
+                                                                                current + param.ParameterType.ToString() + ", ").
+                                          TrimEnd(new[] {',', ' '})));
 
             PhaseParam = decMethods;
             return true;
@@ -187,8 +194,7 @@ namespace NETDeob.Core.Deobfuscators.Generic
 
         public string DynamicDecrypt(int token, GenericDecryptionContext ctx)
         {
-            var method = ResolveReflectionMethod(token);
-            return (string) method.Invoke(null, ctx.FetchParameters().ToArray());
+            return (string) ResolveReflectionMethod(token).Invoke(null, ctx.FetchParameters().ToArray());
         }
         public MethodBase ResolveReflectionMethod(int token)
         {
