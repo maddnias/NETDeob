@@ -35,6 +35,26 @@ namespace NETDeob.Core.Deobfuscators.Generic
 
         public IEnumerable<object> FetchParameters()
         {
+            var @params = FetchParametersNormalWay();
+            if (@params.Count() == Target.Method.Parameters.Count && false)
+                yield return @params;
+
+            // lets try another method
+            var tracer = new StackTracer(Source.Body);
+            tracer.TraceUntil(BadInstructions[0]);
+            var reverseStack = new Stack<StackTracer.StackEntry>();
+            for (int i = 0 ; i < Target.ParameterCount ; i++)
+            {
+                reverseStack.Push(tracer.Stack.Pop());
+            }
+            for (int i = 0; i < Target.ParameterCount; i++)
+            {
+                yield return reverseStack.Pop();
+            }
+        }
+
+        private IEnumerable<object> FetchParametersNormalWay()
+        {
             foreach (var instr in BadInstructions)
                 if (instr.IsLdcI4())
                     yield return instr.GetLdcI4();
@@ -179,7 +199,8 @@ namespace NETDeob.Core.Deobfuscators.Generic
 
         public string DynamicDecrypt(int token, GenericDecryptionContext ctx)
         {
-            return (string) ResolveReflectionMethod(token).Invoke(null, ctx.FetchParameters().ToArray());
+            var method = ResolveReflectionMethod(token);
+            return (string) method.Invoke(null, ctx.FetchParameters().ToArray());
         }
         public MethodBase ResolveReflectionMethod(int token)
         {
