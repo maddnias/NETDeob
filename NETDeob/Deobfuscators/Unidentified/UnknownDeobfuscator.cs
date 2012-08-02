@@ -15,9 +15,13 @@ namespace NETDeob.Core.Deobfuscators.Unidentified
         public override void CreateTaskQueue()
         {
             TaskQueue.Add(new MethodCleaner2(AsmDef));
+
+            if (DeobfuscatorContext.Debug && DeobfuscatorContext.DynamicResourceResolving)
+                TaskQueue.Add(new GenericResourceDumper(AsmDef));
+
             TaskQueue.Add(new MetadataFixer(AsmDef));
 
-            if (DeobfuscatorContext.DynStringCtx != null)
+            if (DeobfuscatorContext.Debug && DeobfuscatorContext.DynStringCtx != null)
                 TaskQueue.Add(new GenericStringDecryptor(AsmDef));
 
             TaskQueue.Add(new Renamer(AsmDef, new RenamingScheme(true) { Resources = false }));

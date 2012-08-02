@@ -69,6 +69,7 @@
   <ItemGroup>
     <Compile Include="Deobfuscator.cs" />
     <Compile Include="Deobfuscators\Confuser\Tasks\1_7\ProxyResolver2.cs" />
+    <Compile Include="Deobfuscators\Generic\GenericResourceDumper.cs" />
     <Compile Include="Deobfuscators\Generic\MetadataFixer.cs" />
     <Compile Include="Deobfuscators\Generic\GenericStringDecryptor.cs" />
     <Compile Include="Deobfuscators\Generic\StackTracer.cs" />

@@ -18,6 +18,16 @@ namespace NETDeob.Core.Engine.Utils.Extensions
             return outCollection;
         }
 
+        public static Instruction DoUntil(this Collection<Instruction> instrList, Instruction curInstr, Predicate<Instruction> pred, bool forward)
+        {
+            var tmpInstr = curInstr;
+
+            while (!pred((tmpInstr = (forward ? tmpInstr.Next : tmpInstr.Previous))))
+                continue;
+
+            return tmpInstr;
+        }
+
         public static T GetOperandAt<T>(this Collection<Instruction> instructions, OpCode opCode, int index)
         {
             for (int i = 0, x = 0; i < instructions.Count; i++)

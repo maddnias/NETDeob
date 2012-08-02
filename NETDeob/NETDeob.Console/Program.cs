@@ -91,6 +91,8 @@ namespace NETDeob._Console
                 }
                 if (cmd is CmdDebug)
                     DeobfuscatorContext.Debug = true;
+                if (cmd is CmdDynamicResourceDecryption)
+                    DeobfuscatorContext.DynamicResourceResolving = true;
             }
         }
 

@@ -55,6 +55,7 @@ namespace NETDeob.Core.Misc
         }
 
         public static bool Debug = false;
+        public static bool DynamicResourceResolving = false;
 
         public static OutputType Output;
 

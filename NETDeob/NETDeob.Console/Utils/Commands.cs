@@ -57,6 +57,21 @@ namespace NETDeob._Console.Utils
             throw new NotImplementedException();
         }
     }
+    public class CmdDynamicResourceDecryption : Command
+    {
+        public CmdDynamicResourceDecryption()
+        {
+            Name = "Dynamic resource resolving";
+            Description = "Dynamically resolves encrypted resources and injects them";
+            RawCommand = "-dres";
+            Incompabilities = new List<Command>();
+        }
+
+        public override void Display(dynamic param)
+        {
+            throw new NotImplementedException();
+        }
+    }
     public class CmdDebug : Command
     {
         public CmdDebug()
