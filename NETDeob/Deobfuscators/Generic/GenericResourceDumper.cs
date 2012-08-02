@@ -52,7 +52,10 @@ namespace NETDeob.Core.Deobfuscators.Generic
         public bool Phase2()
         {
             var token = (PhaseParam as MethodDefinition).MetadataToken.ToInt32();
-            var rEvent = new ResolveEventArgs("ConsoleApplication1.Properties.Resources.resources", _rAssembly);
+
+            //TODO: Stable way of retrieving this string
+            var rEvent = new ResolveEventArgs(AsmDef.Name.Name + ".Properties.Resources.resources", _rAssembly);
+
             var asm = DynamicDecrypt<Assembly>(token, new object[] {null, rEvent});
 
             if (asm == null)
