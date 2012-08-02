@@ -57,6 +57,21 @@ namespace NETDeob._Console.Utils
             throw new NotImplementedException();
         }
     }
+    public class CmdDebug : Command
+    {
+        public CmdDebug()
+        {
+            Name = "Debug";
+            Description = "internal";
+            RawCommand = "-dbug";
+            Incompabilities = new List<Command>();
+        }
+
+        public override void Display(dynamic param)
+        {
+            throw new NotImplementedException();
+        }
+    }
     public class CmdFetchSignature : Command
     {
         public CmdFetchSignature()

@@ -39,8 +39,13 @@ namespace NETDeob.Core.Engine.Utils
 
                 if (found)
                 {
-                    DeobfuscatorContext.ActiveSignature = signature;
-                    return signature;
+                    if (!DeobfuscatorContext.Debug)
+                    {
+                        DeobfuscatorContext.ActiveSignature = signature;
+                        return signature;
+                    }
+                    
+                    return new Signatures.UnidentifiedSignature();
                 }
             }
 

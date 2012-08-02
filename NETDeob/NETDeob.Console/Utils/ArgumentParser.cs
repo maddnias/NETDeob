@@ -18,7 +18,8 @@ namespace NETDeob._Console.Utils
                                                  new CmdHelp(),
                                                  new CmdOut(),
                                                  new CmdFetchSignature(),
-                                                 new CmdDynamicStringDecryption()
+                                                 new CmdDynamicStringDecryption(),
+                                                 new CmdDebug()
                                              };
 
         public List<Command> ParsedCommands { get; private set; }

@@ -54,6 +54,8 @@ namespace NETDeob.Core.Misc
             Verbose = 1
         }
 
+        public static bool Debug = false;
+
         public static OutputType Output;
 
         public static string InPath;
