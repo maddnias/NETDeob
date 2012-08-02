@@ -89,6 +89,8 @@ namespace NETDeob._Console
                 {
                     token = Int32.Parse(cmd.UserInput.Split(':')[1].Trim(), NumberStyles.HexNumber);
                 }
+                if (cmd is CmdDebug)
+                    DeobfuscatorContext.Debug = true;
             }
         }
 

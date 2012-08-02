@@ -32,7 +32,6 @@ namespace NETDeob.Core.Engine.Utils
 
         public static ISignature Identify(AssemblyDefinition asmDef)
         {
-            return new Signatures.UnidentifiedSignature();
             foreach (var task in IdentifierTasks)
             {
                 bool found;
@@ -40,8 +39,13 @@ namespace NETDeob.Core.Engine.Utils
 
                 if (found)
                 {
-                    DeobfuscatorContext.ActiveSignature = signature;
-                    return signature;
+                    if (!DeobfuscatorContext.Debug)
+                    {
+                        DeobfuscatorContext.ActiveSignature = signature;
+                        return signature;
+                    }
+                    
+                    return new Signatures.UnidentifiedSignature();
                 }
             }
 
