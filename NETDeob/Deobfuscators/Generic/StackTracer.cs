@@ -116,52 +116,85 @@ namespace NETDeob.Core.Deobfuscators.Generic
                     _stack.Pop();
                     break;
                 case Code.Ldloc_S:
-             
+                    _stack.Push(LocalToStackEntry(instruction, _locals[0]));
                     break;
                 case Code.Ldloca_S:
+                    _stack.Push(new StackEntry(instruction, false)); 
                     break;
                 case Code.Stloc_S:
+                    _stack.Pop();
                     break;
                 case Code.Ldnull:
+                    _stack.Push(new StackEntry(instruction, true, null));
                     break;
                 case Code.Ldc_I4_M1:
+                    _stack.Push(new StackEntry(instruction, true, (int)-1));
                     break;
                 case Code.Ldc_I4_0:
+                    _stack.Push(new StackEntry(instruction, true, (int)0));
                     break;
                 case Code.Ldc_I4_1:
+                    _stack.Push(new StackEntry(instruction, true, (int)1));
                     break;
                 case Code.Ldc_I4_2:
+                    _stack.Push(new StackEntry(instruction, true, (int)2));
                     break;
                 case Code.Ldc_I4_3:
+                    _stack.Push(new StackEntry(instruction, true, (int)3));
                     break;
                 case Code.Ldc_I4_4:
+                    _stack.Push(new StackEntry(instruction, true, (int)4));
                     break;
                 case Code.Ldc_I4_5:
+                    _stack.Push(new StackEntry(instruction, true, (int)5));
                     break;
                 case Code.Ldc_I4_6:
+                    _stack.Push(new StackEntry(instruction, true, (int)6));
                     break;
                 case Code.Ldc_I4_7:
+                    _stack.Push(new StackEntry(instruction, true, (int)7));
                     break;
                 case Code.Ldc_I4_8:
+                    _stack.Push(new StackEntry(instruction, true, (int)8));
                     break;
                 case Code.Ldc_I4_S:
+                    _stack.Push(new StackEntry(instruction, true, instruction.Operand));
                     break;
                 case Code.Ldc_I4:
+                    _stack.Push(new StackEntry(instruction, true, instruction.Operand));
                     break;
                 case Code.Ldc_I8:
+                    _stack.Push(new StackEntry(instruction, true, instruction.Operand));
                     break;
                 case Code.Ldc_R4:
+                    _stack.Push(new StackEntry(instruction, true, instruction.Operand));
                     break;
                 case Code.Ldc_R8:
+                    _stack.Push(new StackEntry(instruction, true, instruction.Operand));
                     break;
                 case Code.Dup:
+                    var value = _stack.Pop();
+                    _stack.Push(value);
+                    value.PushedBy = instruction;
+                    _stack.Push(value);
                     break;
                 case Code.Pop:
+                    _stack.Pop();
                     break;
-                case Code.Jmp:
-                    break;
+                //TODO: Implement
+                /*case Code.Jmp:
+                    break;*/
                 case Code.Call:
-                    break;
+                    var mr = (instruction.Operand as MethodReference);
+
+                    for (int i = 0; i < mr.Parameters.Count; i++)
+                        _stack.Pop();
+
+                    if ((instruction.Operand as MethodReference).ReturnType != mr.Module.Import(typeof(void)))
+                    {
+                        _stack.Push(new StackEntry(instruction, false));
+                    }
+                            break;
                 case Code.Calli:
                     break;
                 case Code.Ret:
