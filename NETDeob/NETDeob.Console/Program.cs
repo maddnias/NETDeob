@@ -52,9 +52,13 @@ namespace NETDeob._Console
             DeobfuscatorContext.OutPath = DeobfuscatorContext.InPath + "_deobf.exe";
             ActivateCommands(parser, out autoDeob, out token);
 
+            DeobfuscatorOptions options = new DeobfuscatorOptions();
+            options.UnhandledExceptionHandler = Handler;
+            options.LoadPlugins = true;
+
             if (autoDeob)
             {
-                var deob = new Deobfuscator(Handler);
+                var deob = new Deobfuscator(options);
                 deob.Deobfuscate(token == 0
                                      ? null
                                      : new DynamicStringDecryptionContetx
