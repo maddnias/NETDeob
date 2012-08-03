@@ -26,6 +26,7 @@ namespace NETDeob.Core.Deobfuscators.Generic
 
     public class GenericDecryptionContext : DecryptionContext
     {
+        public Instruction Call;
         public List<Instruction> BadInstructions = new List<Instruction>();
         public MethodDefinition Source;
         public Decryptor Target;
@@ -35,13 +36,14 @@ namespace NETDeob.Core.Deobfuscators.Generic
 
         public IEnumerable<object> FetchParameters()
         {
-            var @params = FetchParametersInternal();
-            return @params.Reverse();
+            var st = new StackTracer(Source.Body);
+            BadInstructions = st.TraceCall(Call).ToList();
+
+            return st.Stack.Select(entry => entry.Value.OptimizeValue());
         }
 
         private IEnumerable<object> FetchParametersInternal()
         {
-            
             foreach (var instr in BadInstructions)
                 if (instr.IsLdcI4())
                     yield return instr.GetLdcI4().OptimizeValue();
@@ -194,12 +196,13 @@ namespace NETDeob.Core.Deobfuscators.Generic
 
             return calls.Select(call => new GenericDecryptionContext
                                             {
-                                                BadInstructions =
-                                                    call.Item2.Body.Instructions.SliceBlock(call.Item1,
-                                                                                            decMethods.First(
-                                                                                                dm =>
-                                                                                                dm.Method == (call.Item1.Operand as MethodReference).Resolve()).
-                                                                                                Method.Parameters.Count).ToList(),
+                                                Call = call.Item1,
+                                                //BadInstructions =
+                                                //    call.Item2.Body.Instructions.SliceBlock(call.Item1,
+                                                //                                            decMethods.First(
+                                                //                                                dm =>
+                                                //                                                dm.Method == (call.Item1.Operand as MethodReference).Resolve()).
+                                                //                                                Method.Parameters.Count).ToList(),
                                                 Source = call.Item2,
                                                 Target =
                                                     decMethods.First(
@@ -212,8 +215,8 @@ namespace NETDeob.Core.Deobfuscators.Generic
         public string DynamicDecrypt(int token, GenericDecryptionContext ctx)
         {
             var method = ResolveReflectionMethod(token);
-            var parameters = ctx.FetchParameters().ToArray();
-            return (string)method.Invoke(null, parameters);
+            var parameters = ctx.FetchParameters().Reverse();
+            return (string)method.Invoke(null, parameters.ToArray());
         }
         public MethodBase ResolveReflectionMethod(int token)
         {

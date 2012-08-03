@@ -8,6 +8,25 @@ namespace NETDeob.Core.Engine.Utils
 {
     public class StackTracer
     {
+        private class Snapshot
+        {
+            public Stack<StackEntry> ClonedStack;
+            public Dictionary<int, LocalEntry> ClonedLocals;
+            public Instruction CurrentInstruction;
+            public MethodBody Body;
+
+            public Snapshot Previous;
+
+            public Snapshot(Stack<StackEntry> clonedStack, Dictionary<int, LocalEntry> clonedLocals, Instruction currentInstruction, MethodBody body, Snapshot previous)
+            {
+                ClonedStack = clonedStack;
+                ClonedLocals = clonedLocals;
+                CurrentInstruction = currentInstruction;
+                Body = body;
+                Previous = previous;
+            }
+        }
+
         public abstract class Entry
         {
             protected Entry(Instruction by, bool known, object value = null)
@@ -28,6 +47,7 @@ namespace NETDeob.Core.Engine.Utils
         private int _instructionPointer = 0;
         private Stack<StackEntry> _stack = new Stack<StackEntry>();
         private Dictionary<int, LocalEntry> _locals = new Dictionary<int, LocalEntry>();
+        private List<Snapshot> Snapshots = new List<Snapshot>();
         #endregion
 
         public Stack<StackEntry> Stack { get { return _stack; } } 
@@ -39,7 +59,25 @@ namespace NETDeob.Core.Engine.Utils
 
         public void TraceUntil(Instruction instruction)
         {
+            Snapshots.Add(new Snapshot(new Stack<StackEntry>(Stack), new Dictionary<int, LocalEntry>(_locals),
+                                       instruction, _methodBody, null));
             Trace(() => _methodBody.Instructions[_instructionPointer] != instruction);
+        }
+
+        public IEnumerable<Instruction> TraceCall(Instruction instruction)
+        {
+            TraceUntil(instruction);
+
+            var target = (instruction.Operand as MethodReference);
+            var currentSnapshot = Snapshots[Snapshots.Count -1];
+
+            while(currentSnapshot.ClonedStack.Count > Stack.Count - target.Parameters.Count)
+            {
+                yield return currentSnapshot.CurrentInstruction;
+                currentSnapshot = currentSnapshot.Previous;
+            }
+
+            yield return instruction;
         }
 
         private void Trace(Func<bool> continueCondition)
@@ -174,10 +212,10 @@ namespace NETDeob.Core.Engine.Utils
                     _stack.Push(new StackEntry(instruction, true, (int)8));
                     break;
                 case Code.Ldc_I4_S:
-                    _stack.Push(new StackEntry(instruction, true, instruction.Operand));
+                    _stack.Push(new StackEntry(instruction, true, (int)Convert.ChangeType(instruction.Operand, typeof(int))));
                     break;
                 case Code.Ldc_I4:
-                    _stack.Push(new StackEntry(instruction, true, instruction.Operand));
+                    _stack.Push(new StackEntry(instruction, true, (int)Convert.ChangeType(instruction.Operand, typeof(int))));
                     break;
                 case Code.Ldc_I8:
                     _stack.Push(new StackEntry(instruction, true, instruction.Operand));
@@ -338,6 +376,15 @@ namespace NETDeob.Core.Engine.Utils
                                    ? new StackEntry(instruction, true, -((int) Stack.Pop().Value))
                                    : new StackEntry(instruction, false));
                     break;
+                case Code.Ldstr:
+                    Stack.Push(new StackEntry(instruction, true, instruction.Operand as string));
+                    break;
+                case Code.Conv_I8:
+                    if (Stack.Peek().IsValueKnown)
+                        if (Stack.Peek().Value is int)
+                            Stack.Push(new StackEntry(instruction, true,
+                                                      (long) Convert.ChangeType(Stack.Pop().Value, typeof (long))));
+                    break;
                 case Code.Beq_S:
                     break;
                 case Code.Bge_S:
@@ -424,8 +471,6 @@ namespace NETDeob.Core.Engine.Utils
                     break;
                 case Code.Conv_I4:
                     break;
-                case Code.Conv_I8:
-                    break;
                 case Code.Conv_R4:
                     break;
                 case Code.Conv_R8:
@@ -439,8 +484,6 @@ namespace NETDeob.Core.Engine.Utils
                 case Code.Cpobj:
                     break;
                 case Code.Ldobj:
-                    break;
-                case Code.Ldstr:
                     break;
                 case Code.Newobj:
                     break;
@@ -660,6 +703,9 @@ namespace NETDeob.Core.Engine.Utils
             executed++;
 
             #endregion
+
+            Snapshots.Add(new Snapshot(new Stack<StackEntry>(Stack), new Dictionary<int, LocalEntry>(_locals),
+                                       instruction, _methodBody, Snapshots[Snapshots.Count -1]));
 
             if (!wasExactInstructionProcessed)
             {

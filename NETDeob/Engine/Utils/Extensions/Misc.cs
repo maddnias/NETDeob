@@ -55,14 +55,19 @@ namespace NETDeob.Core.Engine.Utils.Extensions
 
         public static object OptimizeValue(this object val)
         {
-            var _val = Convert.ToInt64(val);
+            if (val is int || val is long)
+            {
+                var _val = Convert.ToInt64(val);
 
-            if (_val >= byte.MinValue && _val <= byte.MaxValue)
-                return (byte)_val;
-            if (_val >= byte.MaxValue && _val <= Int32.MaxValue)
-                return (int)_val;
+                if (_val >= byte.MinValue && _val <= byte.MaxValue)
+                    return (byte)_val;
+                if (_val > byte.MaxValue && _val <= Int32.MaxValue)
+                    return (int)_val;
 
-            return _val;
+                return _val;
+            }
+
+            return val;
         }
 
         public static bool SafeRefCheck<T>(this T member1, T member2) where T : MemberReference
