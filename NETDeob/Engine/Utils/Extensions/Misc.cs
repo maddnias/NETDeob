@@ -4,11 +4,55 @@ using System.Globalization;
 using System.Linq;
 using System.Text;
 using Mono.Cecil;
+using NETDeob.Core.Deobfuscators.Generic;
 
 namespace NETDeob.Core.Engine.Utils.Extensions
 {
     public static class MiscExt
     {
+        public static bool VerifyTop(this Stack<StackTracer.StackEntry> stack)
+        {
+            var holder = stack.Pop();
+
+            if (holder.IsValueKnown && stack.Peek().IsValueKnown)
+            {
+                stack.Push(holder);
+                return true;
+            }
+
+            stack.Push(holder);
+            return false;
+        }
+
+        public static bool VerifyTop<T>(this Stack<StackTracer.StackEntry> stack)
+        {
+            var holder = stack.Pop();
+
+            if (stack.VerifyTop())
+            {
+                if (holder.Value.GetType().CanCastTo<T>(holder) &&
+                    stack.Peek().Value.GetType().CanCastTo<T>(stack.Peek().Value))
+                    stack.Push(holder);
+                return true;
+            }
+
+            stack.Push(holder);
+            return false;
+        }
+
+        public static bool CanCastTo<T>(this Type from, object val)
+        {
+            try
+            {
+                Convert.ChangeType(val, typeof(T));
+                return true;
+            }
+            catch
+            {
+                return false;
+            }
+        }
+
         public static object OptimizeValue(this object val)
         {
             var _val = Convert.ToInt64(val);

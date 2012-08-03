@@ -1,14 +1,27 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using Mono.Cecil;
 using Mono.Cecil.Cil;
+using NETDeob.Core.Engine.Utils.Extensions;
 
-namespace NETDeob.Core.Deobfuscators.Generic
+namespace NETDeob.Core.Engine.Utils
 {
     public class StackTracer
     {
+        public abstract class Entry
+        {
+            protected Entry(Instruction by, bool known, object value = null)
+            {
+                PushedBy = by;
+                IsValueKnown = known;
+                Value = value;
+            }
+
+            public Instruction PushedBy;
+            public object Value;
+            public bool IsValueKnown;
+        }
+
         private MethodBody _methodBody;
 
         #region Execution state
@@ -62,7 +75,10 @@ namespace NETDeob.Core.Deobfuscators.Generic
 
         private int ExecuteInstruction(Instruction instruction)
         {
-            bool wasExactInstructionProcessed = true;
+            var wasExactInstructionProcessed = true;
+            var executed = 0;
+
+            #region big switch
 
             switch (instruction.OpCode.Code)
             {
@@ -199,11 +215,128 @@ namespace NETDeob.Core.Deobfuscators.Generic
                     break;
                 case Code.Ret:
                     break;
+                case Code.Br:
                 case Code.Br_S:
-                    break;
+                    return _methodBody.Instructions.IndexOf(instruction.Operand as Instruction);
+                case Code.Brfalse:
                 case Code.Brfalse_S:
+                    if (Stack.Peek().IsValueKnown && Stack.Peek().Value.GetType().CanCastTo<bool>(Stack.Peek().Value))
+                        if (!Convert.ToBoolean(Stack.Pop()))
+                            return _methodBody.Instructions.IndexOf(instruction.Operand as Instruction);
                     break;
+                case Code.Brtrue:
                 case Code.Brtrue_S:
+                    if (Stack.Peek().IsValueKnown && Stack.Peek().Value.GetType().CanCastTo<bool>(Stack.Peek().Value))
+                        if (Convert.ToBoolean(Stack.Pop()))
+                            return _methodBody.Instructions.IndexOf(instruction.Operand as Instruction);
+                    break;
+                case Code.Add:
+                    if (Stack.VerifyTop<int>())
+                        Stack.Push(new StackEntry(instruction, true, (int)Stack.Pop().Value + (int)Stack.Pop().Value));
+                    else
+                    {
+                        Stack.Pop();
+                        Stack.Pop();
+                        Stack.Push(new StackEntry(instruction, false));
+                    }
+                    break;
+                case Code.Sub:
+                    if (Stack.VerifyTop<int>())
+                        Stack.Push(new StackEntry(instruction, true, (int)Stack.Pop().Value - (int)Stack.Pop().Value));
+                    else
+                    {
+                        Stack.Pop();
+                        Stack.Pop();
+                        Stack.Push(new StackEntry(instruction, false));
+                    }
+                    break;
+                case Code.Mul:
+                    if (Stack.VerifyTop<int>())
+                        Stack.Push(new StackEntry(instruction, true, (int)Stack.Pop().Value * (int)Stack.Pop().Value));
+                    else
+                    {
+                        Stack.Pop();
+                        Stack.Pop();
+                        Stack.Push(new StackEntry(instruction, false));
+                    }
+                    break;
+                case Code.Div_Un:
+                case Code.Div:
+                    if (Stack.VerifyTop<int>())
+                        Stack.Push(new StackEntry(instruction, true, (int)Stack.Pop().Value / (int)Stack.Pop().Value));
+                    else
+                    {
+                        Stack.Pop();
+                        Stack.Pop();
+                        Stack.Push(new StackEntry(instruction, false));
+                    }
+                    break;
+                case Code.Rem:
+                case Code.Rem_Un:
+                    if (Stack.VerifyTop<int>())
+                        Stack.Push(new StackEntry(instruction, true, (int)Stack.Pop().Value % (int)Stack.Pop().Value));
+                    else
+                    {
+                        Stack.Pop();
+                        Stack.Pop();
+                        Stack.Push(new StackEntry(instruction, false));
+                    }
+                    break;
+                case Code.Xor:
+                    if (Stack.VerifyTop<int>())
+                        Stack.Push(new StackEntry(instruction, true, (int)Stack.Pop().Value ^ (int)Stack.Pop().Value));
+                    else
+                    {
+                        Stack.Pop();
+                        Stack.Pop();
+                        Stack.Push(new StackEntry(instruction, false));
+                    }
+                    break;
+                case Code.And:
+                    if (Stack.VerifyTop<int>())
+                        Stack.Push(new StackEntry(instruction, true, (int)Stack.Pop().Value & (int)Stack.Pop().Value));
+                    else
+                    {
+                        Stack.Pop();
+                        Stack.Pop();
+                        Stack.Push(new StackEntry(instruction, false));
+                    }
+                    break;
+                case Code.Or:
+                    if (Stack.VerifyTop<int>())
+                        Stack.Push(new StackEntry(instruction, true, (int)Stack.Pop().Value | (int)Stack.Pop().Value));
+                    else
+                    {
+                        Stack.Pop();
+                        Stack.Pop();
+                        Stack.Push(new StackEntry(instruction, false));
+                    }
+                    break;
+                case Code.Shl:
+                    if (Stack.VerifyTop<int>())
+                        Stack.Push(new StackEntry(instruction, true, (int)Stack.Pop().Value << (int)Stack.Pop().Value));
+                    else
+                    {
+                        Stack.Pop();
+                        Stack.Pop();
+                        Stack.Push(new StackEntry(instruction, false));
+                    }
+                    break;
+                case Code.Shr_Un:
+                case Code.Shr:
+                    if (Stack.VerifyTop<int>())
+                        Stack.Push(new StackEntry(instruction, true, (int)Stack.Pop().Value >> (int)Stack.Pop().Value));
+                    else
+                    {
+                        Stack.Pop();
+                        Stack.Pop();
+                        Stack.Push(new StackEntry(instruction, false));
+                    }
+                    break;
+                case Code.Neg:
+                    Stack.Push(Stack.Peek().Value.GetType().CanCastTo<int>(Stack.Peek())
+                                   ? new StackEntry(instruction, true, -((int) Stack.Pop().Value))
+                                   : new StackEntry(instruction, false));
                     break;
                 case Code.Beq_S:
                     break;
@@ -224,12 +357,6 @@ namespace NETDeob.Core.Deobfuscators.Generic
                 case Code.Ble_Un_S:
                     break;
                 case Code.Blt_Un_S:
-                    break;
-                case Code.Br:
-                    break;
-                case Code.Brfalse:
-                    break;
-                case Code.Brtrue:
                     break;
                 case Code.Beq:
                     break;
@@ -288,34 +415,6 @@ namespace NETDeob.Core.Deobfuscators.Generic
                 case Code.Stind_R4:
                     break;
                 case Code.Stind_R8:
-                    break;
-                case Code.Add:
-                    break;
-                case Code.Sub:
-                    break;
-                case Code.Mul:
-                    break;
-                case Code.Div:
-                    break;
-                case Code.Div_Un:
-                    break;
-                case Code.Rem:
-                    break;
-                case Code.Rem_Un:
-                    break;
-                case Code.And:
-                    break;
-                case Code.Or:
-                    break;
-                case Code.Xor:
-                    break;
-                case Code.Shl:
-                    break;
-                case Code.Shr:
-                    break;
-                case Code.Shr_Un:
-                    break;
-                case Code.Neg:
                     break;
                 case Code.Not:
                     break;
@@ -558,6 +657,10 @@ namespace NETDeob.Core.Deobfuscators.Generic
                     break;
             }
 
+            executed++;
+
+            #endregion
+
             if (!wasExactInstructionProcessed)
             {
                 switch (instruction.OpCode.StackBehaviourPush)
@@ -576,40 +679,29 @@ namespace NETDeob.Core.Deobfuscators.Generic
                         _stack.Push(new StackEntry(instruction, false));
                         break;
                 }
-                if ((instruction.OpCode.OperandType == OperandType.InlineBrTarget ||
-                     instruction.OpCode.OperandType == OperandType.ShortInlineBrTarget) &&
-                    (instruction.OpCode == OpCodes.Br || instruction.OpCode == OpCodes.Br_S))
+                if (instruction.IsUnconditionalBranch())
                 {
                     return _methodBody.Instructions.IndexOf(instruction);
                 }
             }
+
             return ++_instructionPointer;
         }
 
-        public class StackEntry
+        public class StackEntry : Entry
         {
-            public StackEntry(Instruction by, bool known, object value = null)
+            public StackEntry(Instruction @by, bool known, object value = null)
+                : base(@by, known, value)
             {
-                PushedBy = by;
-                IsValueKnown = known;
-                Value = value;
             }
-            public Instruction PushedBy;
-            public object Value;
-            public bool IsValueKnown;
         }
 
-        public class LocalEntry
+        public class LocalEntry : Entry
         {
-            public LocalEntry(Instruction by, bool known, object value = null)
+            public LocalEntry(Instruction @by, bool known, object value = null)
+                : base(@by, known, value)
             {
-                LastSetBy = by;
-                IsValueKnown = known;
-                Value = value;
             }
-            public Instruction LastSetBy;
-            public object Value;
-            public bool IsValueKnown;
         }
     }
 }
