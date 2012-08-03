@@ -52,13 +52,12 @@ namespace NETDeob._Console
             DeobfuscatorContext.OutPath = DeobfuscatorContext.InPath + "_deobf.exe";
             ActivateCommands(parser, out autoDeob, out token);
 
-            DeobfuscatorOptions options = new DeobfuscatorOptions();
-            options.UnhandledExceptionHandler = Handler;
-            options.LoadPlugins = true;
+            DeobfuscatorContext.Options.UnhandledExceptionHandler = GlobalExcHandle;
+
 
             if (autoDeob)
             {
-                var deob = new Deobfuscator(options);
+                var deob = new Deobfuscator();
                 deob.Deobfuscate(token == 0
                                      ? null
                                      : new DynamicStringDecryptionContetx
@@ -76,7 +75,7 @@ namespace NETDeob._Console
             autoDeob = true;
             token = 0;
 
-            foreach(var cmd in parser.ParsedCommands)
+            foreach (var cmd in parser.ParsedCommands)
             {
                 if (cmd is CmdVerbose)
                     DeobfuscatorContext.Output = DeobfuscatorContext.OutputType.Verbose;
@@ -85,16 +84,22 @@ namespace NETDeob._Console
                 if (cmd is CmdFetchSignature)
                 {
                     autoDeob = false;
-                    var deob = new Deobfuscator(null);
-
-                    Logger.VSLog(deob.FetchSignature());
+                    Logger.VSLog(new Deobfuscator().FetchSignature());
                 }
-                if(cmd is CmdDynamicStringDecryption)
-                {
+                if (cmd is CmdDynamicStringDecryption)
                     token = Int32.Parse(cmd.UserInput.Split(':')[1].Trim(), NumberStyles.HexNumber);
-                }
                 if (cmd is CmdDebug)
                     DeobfuscatorContext.Debug = true;
+                if (cmd is CmdPluginPath)
+                {
+                    DeobfuscatorContext.Options.LoadPlugins = true;
+                    DeobfuscatorContext.Options.PluginLoadPath = cmd.UserInput.Substring(9);
+                }
+                if (cmd is CmdPreferPlugins)
+                {
+                    DeobfuscatorContext.Options.PreferPluginsOverBuiltinIdentifiers = true;
+                    DeobfuscatorContext.Options.LoadPlugins = true;
+                }
             }
         }
 

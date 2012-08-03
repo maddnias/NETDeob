@@ -45,8 +45,8 @@ namespace NETDeob.Core.Engine.Utils
                         DeobfuscatorContext.ActiveSignature = signature;
                         return signature;
                     }
-                    
-                    return new Signatures.UnidentifiedSignature();
+
+                    return signature;
                 }
             }
 
@@ -58,7 +58,7 @@ namespace NETDeob.Core.Engine.Utils
             plugin.RegisterIdentifierTasks(x =>
                                                {
                                                    if (favorPlugins)
-                                                       IdentifierTasks.Prepend(x);
+                                                       IdentifierTasks = IdentifierTasks.Prepend(x).ToList();
                                                    else
                                                        IdentifierTasks.Add(x);
                                                }
@@ -76,7 +76,7 @@ namespace NETDeob.Core.Engine.Utils
                 mDef.Body.Instructions.FirstOfOpCode(OpCodes.Or) != null) != null || (asmDef.EntryPoint.Name.StartsWith("?") && asmDef.EntryPoint.Name.EndsWith("?")))
             {
                 found = true;
-                return new Signatures.PhoenixSignature();
+                return new Signatures.UnidentifiedSignature();
             }
 
             return new Signatures.UnidentifiedSignature();

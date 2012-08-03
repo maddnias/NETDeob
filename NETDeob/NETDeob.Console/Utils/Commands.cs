@@ -57,6 +57,36 @@ namespace NETDeob._Console.Utils
             throw new NotImplementedException();
         }
     }
+    public class CmdPreferPlugins : Command
+    {
+        public CmdPreferPlugins()
+        {
+            Name = "Prefer plugins";
+            Description = "internal";
+            RawCommand = "-prefplugins";
+            Incompabilities = new List<Command>();
+        }
+
+        public override void Display(dynamic param)
+        {
+            throw new NotImplementedException();
+        }
+    }
+    public class CmdPluginPath : Command
+    {
+        public CmdPluginPath()
+        {
+            Name = "Plugin path";
+            Description = "Set path from which NETDeob will loads it's plugins";
+            RawCommand = "-plugins";
+            Incompabilities = new List<Command>();
+        }
+
+        public override void Display(dynamic param)
+        {
+            throw new NotImplementedException();
+        }
+    }
     public class CmdDebug : Command
     {
         public CmdDebug()

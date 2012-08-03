@@ -14,21 +14,24 @@ namespace NETDeob.Core
     {
         //TODO: Add more overloads for Deobfuscate, hopefully more advanced parameters for deobfuscation in the future
 
-        private DeobfuscatorOptions _options;
+        private DeobfuscatorOptions _options = DeobfuscatorContext.Options;
         private List<string> _registeredPlugins = new List<string>();
         
 
-        public Deobfuscator(DeobfuscatorOptions options)
-        {
-            _options = options;
+        //public Deobfuscator(DeobfuscatorOptions options)
+        //{
+        //    _options = options;
 
-            // To keep NETDeob from crashing when an exception occurs
-            if(options.UnhandledExceptionHandler != null)
-                AppDomain.CurrentDomain.UnhandledException += options.UnhandledExceptionHandler;
-        }
+        //    // To keep NETDeob from crashing when an exception occurs
+        //    if(options.UnhandledExceptionHandler != null)
+        //        AppDomain.CurrentDomain.UnhandledException += options.UnhandledExceptionHandler;
+        //}
 
         public void Deobfuscate(DynamicStringDecryptionContetx strCtx = null)
         {
+            if (DeobfuscatorContext.Options.UnhandledExceptionHandler != null)
+                AppDomain.CurrentDomain.UnhandledException += DeobfuscatorContext.Options.UnhandledExceptionHandler;
+
             LoadPlugins();
             DeobfuscatorContext.DynStringCtx = strCtx;
             TaskAssigner.AssignDeobfuscation(DeobfuscatorContext.AsmDef);
