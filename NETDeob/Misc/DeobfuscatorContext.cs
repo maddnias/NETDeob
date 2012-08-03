@@ -58,6 +58,7 @@ namespace NETDeob.Core.Misc
 
         public static OutputType Output;
 
+        public static DeobfuscatorOptions Options = new DeobfuscatorOptions();
         public static string InPath;
         public static string OutPath;
         public static AssemblyDefinition AsmDef;

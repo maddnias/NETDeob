@@ -6,6 +6,7 @@ using Mono.Cecil;
 using Mono.Cecil.Cil;
 using NETDeob.Core.Engine.Utils.Extensions;
 using NETDeob.Core.Misc;
+using NETDeob.Core.Plugins;
 using NETDeob.Misc;
 using NETDeob.Misc.Structs__Enums___Interfaces.Signatures;
 
@@ -13,8 +14,8 @@ namespace NETDeob.Core.Engine.Utils
 {
     public static class Identifier
     {
-        private delegate ISignature IdentifierTask(AssemblyDefinition asmDef, out bool found);
-        private static readonly List<IdentifierTask> IdentifierTasks = new List<IdentifierTask>
+        public delegate ISignature IdentifierTask(AssemblyDefinition asmDef, out bool found);
+        private static List<IdentifierTask> IdentifierTasks = new List<IdentifierTask>
                                                                   {
                                                                       new IdentifierTask(IdentifyConfuser),
                                                                       new IdentifierTask(IdentifyPhoenixProtector),
@@ -44,12 +45,25 @@ namespace NETDeob.Core.Engine.Utils
                         DeobfuscatorContext.ActiveSignature = signature;
                         return signature;
                     }
-                    
-                    return new Signatures.UnidentifiedSignature();
+
+                    return signature;
                 }
             }
 
             return new Signatures.UnidentifiedSignature();
+        }
+
+        public static void RegisterPlugin(IPlugin plugin, bool favorPlugins)
+        {
+            plugin.RegisterIdentifierTasks(x =>
+                                               {
+                                                   if (favorPlugins)
+                                                       IdentifierTasks = IdentifierTasks.Prepend(x).ToList();
+                                                   else
+                                                       IdentifierTasks.Add(x);
+                                               }
+
+                );
         }
 
         private static ISignature IdentifyPhoenixProtector(AssemblyDefinition asmDef, out bool found)

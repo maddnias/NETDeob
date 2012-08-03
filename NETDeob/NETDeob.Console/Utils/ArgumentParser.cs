@@ -19,7 +19,9 @@ namespace NETDeob._Console.Utils
                                                  new CmdOut(),
                                                  new CmdFetchSignature(),
                                                  new CmdDynamicStringDecryption(),
-                                                 new CmdDebug()
+                                                 new CmdDebug(),
+                                                 new CmdPreferPlugins(),
+                                                 new CmdPluginPath()
                                              };
 
         public List<Command> ParsedCommands { get; private set; }
@@ -73,7 +75,7 @@ namespace NETDeob._Console.Utils
                     }
                 }
 
-                cmd.UserInput = raw.Substring(4);
+                cmd.UserInput = raw;
                 ParsedCommands.Add(cmd);
             }
 
