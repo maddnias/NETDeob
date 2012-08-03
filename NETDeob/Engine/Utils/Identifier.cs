@@ -76,7 +76,7 @@ namespace NETDeob.Core.Engine.Utils
                 mDef.Body.Instructions.FirstOfOpCode(OpCodes.Or) != null) != null || (asmDef.EntryPoint.Name.StartsWith("?") && asmDef.EntryPoint.Name.EndsWith("?")))
             {
                 found = true;
-                return new Signatures.UnidentifiedSignature();
+                return new Signatures.PhoenixSignature();
             }
 
             return new Signatures.UnidentifiedSignature();
