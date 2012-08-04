@@ -212,8 +212,6 @@ namespace NETDeob.Core.Engine.Utils
                     _stack.Push(new StackEntry(instruction, true, (int)8));
                     break;
                 case Code.Ldc_I4_S:
-                    _stack.Push(new StackEntry(instruction, true, (int)Convert.ChangeType(instruction.Operand, typeof(int))));
-                    break;
                 case Code.Ldc_I4:
                     _stack.Push(new StackEntry(instruction, true, (int)Convert.ChangeType(instruction.Operand, typeof(int))));
                     break;

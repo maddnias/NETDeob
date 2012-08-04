@@ -42,32 +42,32 @@ namespace NETDeob.Core.Deobfuscators.Generic
             return st.Stack.Select(entry => entry.Value.OptimizeValue());
         }
 
-        private IEnumerable<object> FetchParametersInternal()
-        {
-            foreach (var instr in BadInstructions)
-                if (instr.IsLdcI4())
-                    yield return instr.GetLdcI4().OptimizeValue();
-                else if (instr.IsLdcI8WOperand())
-                    yield return instr.GetLdcI8().OptimizeValue();
-                else if (instr.OpCode == OpCodes.Ldstr)
-                    yield return instr.Operand as string;
-        }
+        //private IEnumerable<object> FetchParametersInternal()
+        //{
+        //    foreach (var instr in BadInstructions)
+        //        if (instr.IsLdcI4())
+        //            yield return instr.GetLdcI4().OptimizeValue();
+        //        else if (instr.IsLdcI8WOperand())
+        //            yield return instr.GetLdcI8().OptimizeValue();
+        //        else if (instr.OpCode == OpCodes.Ldstr)
+        //            yield return instr.Operand as string;
+        //}
 
-        private IEnumerable<object> FetchParametersWithStackTracer()
-        {
-            Logger.VSLog("");
-            Logger.VSLog("StackTrace: " + Source.FullName);
+        //private IEnumerable<object> FetchParametersWithStackTracer()
+        //{
+        //    Logger.VSLog("");
+        //    Logger.VSLog("StackTrace: " + Source.FullName);
 
-            var tracer = new StackTracer(Source.Body);
-            tracer.TraceUntil(BadInstructions[0]);
+        //    var tracer = new StackTracer(Source.Body);
+        //    tracer.TraceUntil(BadInstructions[0]);
 
-            // have to reverse the stack to pass parameters correctly
-            var reverseStack = new Stack<StackTracer.StackEntry>();
-            for (var i = 0; i < Target.ParameterCount; i++)
-                reverseStack.Push(tracer.Stack.Pop());
-            for (var i = 0; i < Target.ParameterCount; i++)
-                yield return reverseStack.Pop().Value;
-        }
+        //    // have to reverse the stack to pass parameters correctly
+        //    var reverseStack = new Stack<StackTracer.StackEntry>();
+        //    for (var i = 0; i < Target.ParameterCount; i++)
+        //        reverseStack.Push(tracer.Stack.Pop());
+        //    for (var i = 0; i < Target.ParameterCount; i++)
+        //        yield return reverseStack.Pop().Value;
+        //}
 
         public override string ToString()
         {
