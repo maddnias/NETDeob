@@ -17,7 +17,11 @@ namespace NETDeob.Core.Engine.Utils
 
             public Snapshot Previous;
 
-            public Snapshot(Stack<StackEntry> clonedStack, Dictionary<int, LocalEntry> clonedLocals, Instruction currentInstruction, MethodBody body, Snapshot previous)
+            public Snapshot(Stack<StackEntry> clonedStack,
+                Dictionary<int, LocalEntry> clonedLocals,
+                Instruction currentInstruction,
+                MethodBody body,
+                Snapshot previous)
             {
                 ClonedStack = clonedStack;
                 ClonedLocals = clonedLocals;
@@ -44,17 +48,20 @@ namespace NETDeob.Core.Engine.Utils
         private MethodBody _methodBody;
 
         #region Execution state
-        private int _instructionPointer = 0;
+
+        private int _instructionPointer = 0, _maxExecuteCount = 0, _currentCount = 0;
         private Stack<StackEntry> _stack = new Stack<StackEntry>();
         private Dictionary<int, LocalEntry> _locals = new Dictionary<int, LocalEntry>();
         private List<Snapshot> Snapshots = new List<Snapshot>();
+
         #endregion
 
         public Stack<StackEntry> Stack { get { return _stack; } } 
 
-        public StackTracer(MethodBody methodBody)
+        public StackTracer(MethodBody methodBody, int maxExecuteCount)
         {
             _methodBody = methodBody;
+            _maxExecuteCount = maxExecuteCount;
         }
 
         public void TraceUntil(Instruction instruction)
@@ -84,6 +91,9 @@ namespace NETDeob.Core.Engine.Utils
         {
             while (continueCondition())
             {
+                if (_instructionPointer == -1)
+                    throw new Exception("Infinite loop?");
+
                 var instruction = _methodBody.Instructions[_instructionPointer];
                 _instructionPointer = ExecuteInstruction(instruction);
             }
@@ -114,7 +124,9 @@ namespace NETDeob.Core.Engine.Utils
         private int ExecuteInstruction(Instruction instruction)
         {
             var wasExactInstructionProcessed = true;
-            var executed = 0;
+
+            if (_currentCount >= _maxExecuteCount)
+                return -1;
 
             #region big switch
 
@@ -216,7 +228,7 @@ namespace NETDeob.Core.Engine.Utils
                     _stack.Push(new StackEntry(instruction, true, (int)Convert.ChangeType(instruction.Operand, typeof(int))));
                     break;
                 case Code.Ldc_I8:
-                    _stack.Push(new StackEntry(instruction, true, instruction.Operand));
+                    _stack.Push(new StackEntry(instruction, true, (long)instruction.Operand));
                     break;
                 case Code.Ldc_R4:
                     _stack.Push(new StackEntry(instruction, true, instruction.Operand));
@@ -268,7 +280,7 @@ namespace NETDeob.Core.Engine.Utils
                     break;
                 case Code.Add:
                     if (Stack.VerifyTop<int>())
-                        Stack.Push(new StackEntry(instruction, true, (int)Stack.Pop().Value + (int)Stack.Pop().Value));
+                        Stack.Push(new StackEntry(instruction, true, (dynamic)Stack.Pop().Value + (dynamic)Stack.Pop().Value));
                     else
                     {
                         Stack.Pop();
@@ -278,7 +290,11 @@ namespace NETDeob.Core.Engine.Utils
                     break;
                 case Code.Sub:
                     if (Stack.VerifyTop<int>())
-                        Stack.Push(new StackEntry(instruction, true, (int)Stack.Pop().Value - (int)Stack.Pop().Value));
+                    {
+                        var holder = Stack.Pop().Value;
+                        Stack.Push(new StackEntry(instruction, true,
+                                                  (dynamic) Stack.Pop().Value - (dynamic)holder));
+                    }
                     else
                     {
                         Stack.Pop();
@@ -288,7 +304,11 @@ namespace NETDeob.Core.Engine.Utils
                     break;
                 case Code.Mul:
                     if (Stack.VerifyTop<int>())
-                        Stack.Push(new StackEntry(instruction, true, (int)Stack.Pop().Value * (int)Stack.Pop().Value));
+                    {
+                        var holder = Stack.Pop().Value;
+                        Stack.Push(new StackEntry(instruction, true,
+                                                  (dynamic)Stack.Pop().Value * (dynamic)holder));
+                    }
                     else
                     {
                         Stack.Pop();
@@ -299,7 +319,7 @@ namespace NETDeob.Core.Engine.Utils
                 case Code.Div_Un:
                 case Code.Div:
                     if (Stack.VerifyTop<int>())
-                        Stack.Push(new StackEntry(instruction, true, (int)Stack.Pop().Value / (int)Stack.Pop().Value));
+                        Stack.Push(new StackEntry(instruction, true, (dynamic)Stack.Pop().Value / (dynamic)Stack.Pop().Value));
                     else
                     {
                         Stack.Pop();
@@ -310,7 +330,7 @@ namespace NETDeob.Core.Engine.Utils
                 case Code.Rem:
                 case Code.Rem_Un:
                     if (Stack.VerifyTop<int>())
-                        Stack.Push(new StackEntry(instruction, true, (int)Stack.Pop().Value % (int)Stack.Pop().Value));
+                        Stack.Push(new StackEntry(instruction, true, (dynamic)Stack.Pop().Value % (dynamic)Stack.Pop().Value));
                     else
                     {
                         Stack.Pop();
@@ -320,7 +340,7 @@ namespace NETDeob.Core.Engine.Utils
                     break;
                 case Code.Xor:
                     if (Stack.VerifyTop<int>())
-                        Stack.Push(new StackEntry(instruction, true, (int)Stack.Pop().Value ^ (int)Stack.Pop().Value));
+                        Stack.Push(new StackEntry(instruction, true, (dynamic)Stack.Pop().Value ^ (dynamic)Stack.Pop().Value));
                     else
                     {
                         Stack.Pop();
@@ -330,7 +350,7 @@ namespace NETDeob.Core.Engine.Utils
                     break;
                 case Code.And:
                     if (Stack.VerifyTop<int>())
-                        Stack.Push(new StackEntry(instruction, true, (int)Stack.Pop().Value & (int)Stack.Pop().Value));
+                        Stack.Push(new StackEntry(instruction, true, (dynamic)Stack.Pop().Value & (dynamic)Stack.Pop().Value));
                     else
                     {
                         Stack.Pop();
@@ -340,7 +360,7 @@ namespace NETDeob.Core.Engine.Utils
                     break;
                 case Code.Or:
                     if (Stack.VerifyTop<int>())
-                        Stack.Push(new StackEntry(instruction, true, (int)Stack.Pop().Value | (int)Stack.Pop().Value));
+                        Stack.Push(new StackEntry(instruction, true, (dynamic)Stack.Pop().Value | (dynamic)Stack.Pop().Value));
                     else
                     {
                         Stack.Pop();
@@ -350,7 +370,7 @@ namespace NETDeob.Core.Engine.Utils
                     break;
                 case Code.Shl:
                     if (Stack.VerifyTop<int>())
-                        Stack.Push(new StackEntry(instruction, true, (int)Stack.Pop().Value << (int)Stack.Pop().Value));
+                        Stack.Push(new StackEntry(instruction, true, (dynamic)Stack.Pop().Value << (dynamic)Stack.Pop().Value));
                     else
                     {
                         Stack.Pop();
@@ -361,7 +381,7 @@ namespace NETDeob.Core.Engine.Utils
                 case Code.Shr_Un:
                 case Code.Shr:
                     if (Stack.VerifyTop<int>())
-                        Stack.Push(new StackEntry(instruction, true, (int)Stack.Pop().Value >> (int)Stack.Pop().Value));
+                        Stack.Push(new StackEntry(instruction, true, (dynamic)Stack.Pop().Value >> (dynamic)Stack.Pop().Value));
                     else
                     {
                         Stack.Pop();
@@ -370,9 +390,11 @@ namespace NETDeob.Core.Engine.Utils
                     }
                     break;
                 case Code.Neg:
-                    Stack.Push(Stack.Peek().Value.GetType().CanCastTo<int>(Stack.Peek())
-                                   ? new StackEntry(instruction, true, -((int) Stack.Pop().Value))
-                                   : new StackEntry(instruction, false));
+                    if(Stack.Peek().IsValueKnown)
+                        if (Stack.Peek().Value.IsNumeric())
+                        {
+                            Stack.Push(new StackEntry(instruction, true, -((dynamic) Stack.Pop().Value)));
+                        }
                     break;
                 case Code.Ldstr:
                     Stack.Push(new StackEntry(instruction, true, instruction.Operand as string));
@@ -383,9 +405,43 @@ namespace NETDeob.Core.Engine.Utils
                             Stack.Push(new StackEntry(instruction, true,
                                                       (long) Convert.ChangeType(Stack.Pop().Value, typeof (long))));
                     break;
-                case Code.Beq_S:
+                case Code.Conv_I1:
+                    if (Stack.Peek().IsValueKnown)
+                        if (Stack.Peek().Value.IsNumeric())
+                            Stack.Push(new StackEntry(instruction, true, Convert.ToByte(Stack.Pop().Value)));
+                            break;
+                case Code.Conv_I2:
+                    if (Stack.Peek().IsValueKnown)
+                        if (Stack.Peek().Value.IsNumeric())
+                            Stack.Push(new StackEntry(instruction, true, Convert.ToInt16(Stack.Pop().Value)));
+                            break;
+                case Code.Conv_I4:
+                    if (Stack.Peek().IsValueKnown)
+                        if (Stack.Peek().Value.IsNumeric())
+                            Stack.Push(new StackEntry(instruction, true, Convert.ToInt32(Stack.Pop().Value)));
                     break;
+                case Code.Conv_R4:
+                    break;
+                case Code.Conv_R8:
+                    break;
+                case Code.Conv_U4:
+                    break;
+                case Code.Conv_U8:
+                    break;
+                case Code.Beq_S:
+                    if (Stack.VerifyTop<int>())
+                    {
+                        if (Stack.Pop().Value == Stack.Pop().Value)
+                            return _methodBody.Instructions.IndexOf(instruction.Operand as Instruction);
+                    }
+                    else if (Stack.VerifyTop())
+                        if(ReferenceEquals(Stack.Pop().Value, Stack.Pop().Value))
+                            return _methodBody.Instructions.IndexOf(instruction.Operand as Instruction);
+                    break;
+                case Code.Bge:
+                case Code.Bge_Un_S:
                 case Code.Bge_S:
+
                     break;
                 case Code.Bgt_S:
                     break;
@@ -395,7 +451,6 @@ namespace NETDeob.Core.Engine.Utils
                     break;
                 case Code.Bne_Un_S:
                     break;
-                case Code.Bge_Un_S:
                     break;
                 case Code.Bgt_Un_S:
                     break;
@@ -404,8 +459,6 @@ namespace NETDeob.Core.Engine.Utils
                 case Code.Blt_Un_S:
                     break;
                 case Code.Beq:
-                    break;
-                case Code.Bge:
                     break;
                 case Code.Bgt:
                     break;
@@ -462,20 +515,6 @@ namespace NETDeob.Core.Engine.Utils
                 case Code.Stind_R8:
                     break;
                 case Code.Not:
-                    break;
-                case Code.Conv_I1:
-                    break;
-                case Code.Conv_I2:
-                    break;
-                case Code.Conv_I4:
-                    break;
-                case Code.Conv_R4:
-                    break;
-                case Code.Conv_R8:
-                    break;
-                case Code.Conv_U4:
-                    break;
-                case Code.Conv_U8:
                     break;
                 case Code.Callvirt:
                     break;
@@ -698,9 +737,9 @@ namespace NETDeob.Core.Engine.Utils
                     break;
             }
 
-            executed++;
-
             #endregion
+
+            _currentCount++;
 
             Snapshots.Add(new Snapshot(new Stack<StackEntry>(Stack), new Dictionary<int, LocalEntry>(_locals),
                                        instruction, _methodBody, Snapshots[Snapshots.Count -1]));

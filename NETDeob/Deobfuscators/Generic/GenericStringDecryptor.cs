@@ -36,7 +36,7 @@ namespace NETDeob.Core.Deobfuscators.Generic
 
         public IEnumerable<object> FetchParameters()
         {
-            var st = new StackTracer(Source.Body);
+            var st = new StackTracer(Source.Body, 1000);
             BadInstructions = st.TraceCall(Call).ToList();
 
             return st.Stack.Select(entry => entry.Value.OptimizeValue());

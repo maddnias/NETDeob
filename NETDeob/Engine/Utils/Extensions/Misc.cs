@@ -30,14 +30,21 @@ namespace NETDeob.Core.Engine.Utils.Extensions
 
             if (stack.VerifyTop())
             {
-                if (holder.Value.GetType().CanCastTo<T>(holder) &&
+                if (holder.Value.GetType().CanCastTo<T>(holder.Value) &&
                     stack.Peek().Value.GetType().CanCastTo<T>(stack.Peek().Value))
+                {
                     stack.Push(holder);
-                return true;
+                    return true;
+                }
             }
 
             stack.Push(holder);
             return false;
+        }
+        //ugly
+        public static bool IsNumeric(this object val)
+        {
+            return val is int || val is long || val is sbyte || val is short || val is ushort || val is ulong || val is uint || val is byte || val is double || val is decimal || val is float;
         }
 
         public static bool CanCastTo<T>(this Type from, object val)
