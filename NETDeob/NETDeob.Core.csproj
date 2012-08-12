@@ -97,7 +97,7 @@
     <Compile Include="Deobfuscators\Generic\Obsolete\Emulation\ConstantFolder.cs" />
     <Compile Include="Deobfuscators\Generic\Obsolete\Control Flow\ILBlock.cs" />
     <Compile Include="Deobfuscators\Generic\Obsolete\MethodCleaner.cs" />
-    <Compile Include="Deobfuscators\Generic\MethodCleaner2.cs" />
+    <Compile Include="Deobfuscators\Generic\MethodCleaner.cs" />
     <Compile Include="Deobfuscators\Generic\Renamer.cs" />
     <Compile Include="Deobfuscators\Manco\MancoDeobfuscator.cs" />
     <Compile Include="Deobfuscators\Manco\Tasks\StringDecryptor.cs" />
