@@ -5,6 +5,7 @@ using System.Security.Cryptography;
 using System.Text;
 using Mono.Cecil;
 using NETDeob.Core.Engine.Utils;
+using NETDeob.Core.Engine.Utils.Extensions;
 using NETDeob.Core.Misc;
 using NETDeob.Core.Plugins;
 

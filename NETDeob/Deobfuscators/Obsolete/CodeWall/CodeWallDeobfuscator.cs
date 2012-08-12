@@ -27,7 +27,7 @@ namespace NETDeob.Deobfuscators.CodeWall
                 //TaskQueue.Add(new StubDumper2(AsmDef));
             }
 
-            TaskQueue.Add(new MethodCleaner2(AsmDef));
+            TaskQueue.Add(new MethodCleaner(AsmDef));
             TaskQueue.Add(new StringDecryptor(AsmDef));
             TaskQueue.Add(new Renamer(AsmDef, new RenamingScheme(true) { Resources = false }));
            

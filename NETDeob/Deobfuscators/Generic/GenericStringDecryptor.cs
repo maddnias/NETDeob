@@ -26,6 +26,7 @@ namespace NETDeob.Core.Deobfuscators.Generic
 
     public class GenericDecryptionContext : DecryptionContext
     {
+        public Instruction Call;
         public List<Instruction> BadInstructions = new List<Instruction>();
         public MethodDefinition Source;
         public Decryptor Target;
@@ -35,20 +36,38 @@ namespace NETDeob.Core.Deobfuscators.Generic
 
         public IEnumerable<object> FetchParameters()
         {
-            var @params = FetchParametersInternal();
-            return @params.Reverse();
+            var st = new StackTracer(Source.Body, 1000);
+            BadInstructions = st.TraceCall(Call).ToList();
+
+            return st.Stack.Select(entry => entry.Value.OptimizeValue());
         }
 
-        private IEnumerable<object> FetchParametersInternal()
-        {
-            foreach (var instr in BadInstructions)
-                if (instr.IsLdcI4())
-                    yield return instr.GetLdcI4().OptimizeValue();
-                else if (instr.IsLdcI8WOperand())
-                    yield return instr.GetLdcI8().OptimizeValue();
-                else if (instr.OpCode == OpCodes.Ldstr)
-                    yield return instr.Operand as string;
-        }
+        //private IEnumerable<object> FetchParametersInternal()
+        //{
+        //    foreach (var instr in BadInstructions)
+        //        if (instr.IsLdcI4())
+        //            yield return instr.GetLdcI4().OptimizeValue();
+        //        else if (instr.IsLdcI8WOperand())
+        //            yield return instr.GetLdcI8().OptimizeValue();
+        //        else if (instr.OpCode == OpCodes.Ldstr)
+        //            yield return instr.Operand as string;
+        //}
+
+        //private IEnumerable<object> FetchParametersWithStackTracer()
+        //{
+        //    Logger.VSLog("");
+        //    Logger.VSLog("StackTrace: " + Source.FullName);
+
+        //    var tracer = new StackTracer(Source.Body);
+        //    tracer.TraceUntil(BadInstructions[0]);
+
+        //    // have to reverse the stack to pass parameters correctly
+        //    var reverseStack = new Stack<StackTracer.StackEntry>();
+        //    for (var i = 0; i < Target.ParameterCount; i++)
+        //        reverseStack.Push(tracer.Stack.Pop());
+        //    for (var i = 0; i < Target.ParameterCount; i++)
+        //        yield return reverseStack.Pop().Value;
+        //}
 
         public override string ToString()
         {
@@ -72,7 +91,7 @@ namespace NETDeob.Core.Deobfuscators.Generic
         {
             var decMethods = YieldDecryptionMethods().ToList();
 
-            if(decMethods.Count == 0)
+            if (decMethods.Count == 0)
             {
                 ThrowPhaseError("Could not locate any decryptor method!", 1, false);
                 return false;
@@ -95,13 +114,13 @@ namespace NETDeob.Core.Deobfuscators.Generic
             var decMethods = PhaseParam as List<Decryptor>;
             var calls = YieldDecryptionCalls(decMethods).ToList();
 
-            foreach(var call in calls)
+            foreach (var call in calls)
                 Logger.VLog(string.Format("Call from {0} -> {1}", call.Item2.Name,
                                           (call.Item1.Operand as MethodReference).Resolve().Name));
 
             Logger.VSLog(string.Format("Found {0} references to decryption methods...", calls.Count));
 
-            PhaseParam = new object[] {decMethods, calls};
+            PhaseParam = new object[] { decMethods, calls };
             return true;
         }
 
@@ -111,7 +130,7 @@ namespace NETDeob.Core.Deobfuscators.Generic
             var decMethods = PhaseParam[0] as List<Decryptor>;
             var calls = PhaseParam[1] as List<Tuple<Instruction, MethodDefinition>>;
 
-            var ctxList = ConstructEntries(new object[] {decMethods, calls}).ToList();
+            var ctxList = ConstructEntries(new object[] { decMethods, calls }).ToList();
             Logger.VSLog(string.Format("Constructed {0} decryption entries", ctxList.Count));
 
             PhaseParam = ctxList;
@@ -177,12 +196,13 @@ namespace NETDeob.Core.Deobfuscators.Generic
 
             return calls.Select(call => new GenericDecryptionContext
                                             {
-                                                BadInstructions =
-                                                    call.Item2.Body.Instructions.SliceBlock(call.Item1,
-                                                                                            decMethods.First(
-                                                                                                dm =>
-                                                                                                dm.Method == (call.Item1.Operand as MethodReference).Resolve()).
-                                                                                                Method.Parameters.Count).ToList(),
+                                                Call = call.Item1,
+                                                //BadInstructions =
+                                                //    call.Item2.Body.Instructions.SliceBlock(call.Item1,
+                                                //                                            decMethods.First(
+                                                //                                                dm =>
+                                                //                                                dm.Method == (call.Item1.Operand as MethodReference).Resolve()).
+                                                //                                                Method.Parameters.Count).ToList(),
                                                 Source = call.Item2,
                                                 Target =
                                                     decMethods.First(
@@ -194,7 +214,9 @@ namespace NETDeob.Core.Deobfuscators.Generic
 
         public string DynamicDecrypt(int token, GenericDecryptionContext ctx)
         {
-            return (string) ResolveReflectionMethod(token).Invoke(null, ctx.FetchParameters().ToArray());
+            var method = ResolveReflectionMethod(token);
+            var parameters = ctx.FetchParameters().Reverse();
+            return (string)method.Invoke(null, parameters.ToArray());
         }
         public MethodBase ResolveReflectionMethod(int token)
         {

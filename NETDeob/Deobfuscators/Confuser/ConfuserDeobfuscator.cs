@@ -30,7 +30,7 @@ namespace NETDeob.Core.Deobfuscators.Confuser
                     TaskQueue.Add(new MetadataFixer(AsmDef));
                     //TaskQueue.Add(new MethodCleaner2(AsmDef));
                     //TaskQueue.Add(new ProxyResolver(AsmDef));
-                    TaskQueue.Add(new MethodCleaner2(AsmDef));
+                    TaskQueue.Add(new MethodCleaner(AsmDef));
                     TaskQueue.Add(new ResourceDecryptor(AsmDef));
                     //TaskQueue.Add(new ProxyResolver2(AsmDef));
                     TaskQueue.Add(new ConstantsDecryptor(AsmDef));

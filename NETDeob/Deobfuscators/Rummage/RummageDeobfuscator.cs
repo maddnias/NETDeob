@@ -18,7 +18,7 @@ namespace NETDeob.Core.Deobfuscators.Rummage
 
         public override void CreateTaskQueue()
         {
-            TaskQueue.Add(new MethodCleaner2(AsmDef));
+            TaskQueue.Add(new MethodCleaner(AsmDef));
             TaskQueue.Add(new RummageStringDecryptor(AsmDef));
             TaskQueue.Add(new Renamer(AsmDef, new RenamingScheme(true)));
 
