@@ -8,9 +8,9 @@ using de4dot.blocks.cflow;
 
 namespace NETDeob.Core.Deobfuscators.Generic
 {
-    class MethodCleaner2 : AssemblyDeobfuscationTask
+    class MethodCleaner : AssemblyDeobfuscationTask
     {
-        public MethodCleaner2(AssemblyDefinition asmDef)
+        public MethodCleaner(AssemblyDefinition asmDef)
             : base(asmDef)
         {
         }

@@ -14,7 +14,7 @@ namespace NETDeob.Core.Deobfuscators.Unidentified
 
         public override void CreateTaskQueue()
         {
-            TaskQueue.Add(new MethodCleaner2(AsmDef));
+            TaskQueue.Add(new MethodCleaner(AsmDef));
             TaskQueue.Add(new MetadataFixer(AsmDef));
 
             if (DeobfuscatorContext.DynStringCtx != null)

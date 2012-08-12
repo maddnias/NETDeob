@@ -44,14 +44,14 @@
     <StartupObject />
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="Mono.Cecil, Version=0.9.5.0, Culture=neutral, PublicKeyToken=9c07db36cfb6fff4, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
+    <Reference Include="Mono.Cecil">
       <HintPath>.\Mono.Cecil.dll</HintPath>
     </Reference>
     <Reference Include="SevenZipSharp">
       <HintPath>.\SevenZipSharp.dll</HintPath>
     </Reference>
     <Reference Include="System" />
+    <Reference Include="System.ComponentModel.Composition" />
     <Reference Include="System.Core" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
@@ -71,7 +71,7 @@
     <Compile Include="Deobfuscators\Confuser\Tasks\1_7\ProxyResolver2.cs" />
     <Compile Include="Deobfuscators\Generic\MetadataFixer.cs" />
     <Compile Include="Deobfuscators\Generic\GenericStringDecryptor.cs" />
-    <Compile Include="Deobfuscators\Generic\StackTracer.cs" />
+    <Compile Include="Engine\Utils\StackTracer.cs" />
     <Compile Include="Deobfuscators\HurpFuscator\HurpDeobfuscator.cs" />
     <Compile Include="Deobfuscators\HurpFuscator\Tasks\1_1\StringDecryptor.cs" />
     <Compile Include="Deobfuscators\HurpFuscator\Tasks\1_0\StringDecryptor.cs" />
@@ -97,7 +97,7 @@
     <Compile Include="Deobfuscators\Generic\Obsolete\Emulation\ConstantFolder.cs" />
     <Compile Include="Deobfuscators\Generic\Obsolete\Control Flow\ILBlock.cs" />
     <Compile Include="Deobfuscators\Generic\Obsolete\MethodCleaner.cs" />
-    <Compile Include="Deobfuscators\Generic\MethodCleaner2.cs" />
+    <Compile Include="Deobfuscators\Generic\MethodCleaner.cs" />
     <Compile Include="Deobfuscators\Generic\Renamer.cs" />
     <Compile Include="Deobfuscators\Manco\MancoDeobfuscator.cs" />
     <Compile Include="Deobfuscators\Manco\Tasks\StringDecryptor.cs" />
@@ -129,6 +129,8 @@
     <Compile Include="Misc\Structs, Enums &amp; Interfaces\Signatures\IObfuscatorSignature.cs" />
     <Compile Include="Misc\Structs, Enums &amp; Interfaces\Tasks\Base\Task.cs" />
     <Compile Include="Misc\Structs, Enums &amp; Interfaces\Tasks\UnpackingTask.cs" />
+    <Compile Include="PluginLoader.cs" />
+    <Compile Include="Plugins\IPlugin.cs" />
     <Compile Include="Unpackers\ExePack\ExePackUnpacker.cs" />
     <Compile Include="Unpackers\ExePack\Tasks\Unpacker.cs" />
     <Compile Include="Unpackers\Mpress\MpressUnpacker.cs" />

@@ -16,7 +16,7 @@ namespace NETDeob.Core.Deobfuscators.Obfusasm
         public override void CreateTaskQueue()
         {
             TaskQueue.Add(new MetadataFixer(AsmDef));
-            TaskQueue.Add(new MethodCleaner2(AsmDef));
+            TaskQueue.Add(new MethodCleaner(AsmDef));
             TaskQueue.Add(new Renamer(AsmDef, new RenamingScheme(true) { Resources = false }));
             TaskQueue.Add(new StringDecryptor(AsmDef));
 

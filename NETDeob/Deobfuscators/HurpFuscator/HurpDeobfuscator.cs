@@ -19,7 +19,7 @@ namespace NETDeob.Core.Deobfuscators.HurpFuscator
 
         public override void CreateTaskQueue()
         {
-            TaskQueue.Add(new MethodCleaner2(AsmDef));
+            TaskQueue.Add(new MethodCleaner(AsmDef));
             TaskQueue.Add(new MetadataFixer(AsmDef));
 
             if(DeobfuscatorContext.ActiveSignature.Ver.Major == 1 && DeobfuscatorContext.ActiveSignature.Ver.Minor == 0)

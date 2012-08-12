@@ -115,7 +115,6 @@ namespace NETDeob.Core.Engine.Utils.Extensions
             return
                 instr.OpCode == OpCodes.Br ||
                 instr.OpCode == OpCodes.Br_S ||
-                instr.OpCode == OpCodes.Jmp ||
                 instr.OpCode == OpCodes.Leave_S ||
                 instr.OpCode == OpCodes.Leave;
         }
