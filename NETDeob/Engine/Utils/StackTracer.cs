@@ -269,13 +269,13 @@ namespace NETDeob.Core.Engine.Utils
                 case Code.Brfalse:
                 case Code.Brfalse_S:
                     if (Stack.Peek().IsValueKnown && Stack.Peek().Value.GetType().CanCastTo<bool>(Stack.Peek().Value))
-                        if (!Convert.ToBoolean(Stack.Pop()))
+                        if (!Convert.ToBoolean(Stack.Pop().Value))
                             return _methodBody.Instructions.IndexOf(instruction.Operand as Instruction);
                     break;
                 case Code.Brtrue:
                 case Code.Brtrue_S:
                     if (Stack.Peek().IsValueKnown && Stack.Peek().Value.GetType().CanCastTo<bool>(Stack.Peek().Value))
-                        if (Convert.ToBoolean(Stack.Pop()))
+                        if (Convert.ToBoolean(Stack.Pop().Value))
                             return _methodBody.Instructions.IndexOf(instruction.Operand as Instruction);
                     break;
                 case Code.Add:
@@ -523,6 +523,7 @@ namespace NETDeob.Core.Engine.Utils
                 case Code.Ldobj:
                     break;
                 case Code.Newobj:
+                    _stack.Push(new StackEntry(instruction, false));
                     break;
                 case Code.Castclass:
                     break;

@@ -63,16 +63,23 @@ namespace NETDeob.Core.Deobfuscators.Generic
         {
             var outList = new List<object>();
 
-            foreach(var asmRef in AsmDef.MainModule.AssemblyReferences)
+            foreach (var asmRef in AsmDef.MainModule.AssemblyReferences)
             {
                 try
                 {
-                    Assembly.Load(asmRef.FullName);
+                    var s = Path.GetDirectoryName(AsmDef.MainModule.FullyQualifiedName) + "\\" + asmRef.Name + ".dll";
+                    Assembly.LoadFrom(s);
                 }
-                catch (FileLoadException e)
+                catch (Exception e)
                 {
-                    if (asmRef.Name.Length <= 1)
+                    try
                     {
+                        Assembly.Load(asmRef.FullName);
+                    }
+                    catch (Exception e2)
+                    {
+                        if (asmRef.Name.Length > 1) continue;
+
                         Logger.VSLog(string.Format("Found invalid assembly reference with MDTok: {0}...",
                                                    asmRef.MetadataToken.ToInt32()));
                         outList.Add(asmRef);
@@ -82,6 +89,8 @@ namespace NETDeob.Core.Deobfuscators.Generic
 
             return outList;
         }
+
+
         private static IEnumerable<object> AnalyzeResources()
         {
             foreach (var res in AsmDef.MainModule.Resources)

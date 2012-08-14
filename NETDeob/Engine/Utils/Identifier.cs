@@ -107,6 +107,8 @@ namespace NETDeob.Core.Engine.Utils
             {
                 found = true;
 
+                if (match.Groups[0].Value == "Confuser v1.6.0.0")
+                    return new Signatures.ConfuserSignature1_6_0_0();
                 if (match.Groups[0].Value == "Confuser v1.7.0.0")
                     return new Signatures.ConfuserSignature1_7_0_0();
                 if (match.Groups[0].Value == "Confuser v1.8.0.0")

@@ -38,6 +38,24 @@ namespace NETDeob.Core.Engine
             }
         }
 
+        public struct ConfuserSignature1_6_0_0 : IUnsupportedSignature
+        {
+            public string Name
+            {
+                get { return "Confuser 1.6.0.0"; }
+            }
+
+            public Version Ver
+            {
+                get { return new Version(1, 6); }
+            }
+
+            public Type DeObfuscator
+            {
+                get { return typeof(ConfuserDeobfuscator); }
+            }
+        }
+
         public struct ConfuserSignature1_7_0_0 : IObfuscatorSignature
         {
             public string Name

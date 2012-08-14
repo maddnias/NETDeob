@@ -224,7 +224,7 @@ namespace NETDeob.Core.Deobfuscators.Generic
         }
         public IEnumerable<Decryptor> YieldDecryptionMethods()
         {
-            return AsmDef.FindMethods(m => m.HasBody).Where(mDef => BaseIsDecryptor(mDef)).Select(mDef => new Decryptor
+            return AsmDef.FindMethods(m => true).Where(mDef => BaseIsDecryptor(mDef)).Select(mDef => new Decryptor
             {
                 Method = mDef,
                 ParameterCount = mDef.Parameters.Count,
