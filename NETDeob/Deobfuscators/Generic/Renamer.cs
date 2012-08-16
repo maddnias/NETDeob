@@ -63,7 +63,7 @@ namespace NETDeob.Core.Deobfuscators.Generic
 
             foreach (var ns in namespaces)
             {
-                if (_scheme.Namespaces)
+                if (_scheme.Namespaces && !ns.Key.EndsWith("My"))
                 {
                     oldName = ns.Key;
 
@@ -90,6 +90,9 @@ namespace NETDeob.Core.Deobfuscators.Generic
                                 !tDef.IsSpecialName &&
                                 !(tDef.Name.StartsWith("<") && tDef.Name.EndsWith(">"))))
                 {
+                    if (typeDef.Namespace.EndsWith("My") || !_scheme.Types)
+                        continue;
+
                     oldName = typeDef.Name;
 
                     if (typeDef.BaseType == null || typeDef.BaseType.Name != "Form")
@@ -103,6 +106,9 @@ namespace NETDeob.Core.Deobfuscators.Generic
 
                 foreach (var typeDef in modDef.GetAllTypes())
                 {
+                    if (typeDef.Namespace.EndsWith("My") || !_scheme.Types)
+                        continue;
+
                     #region Methods
 
                     if (_scheme.Methods)

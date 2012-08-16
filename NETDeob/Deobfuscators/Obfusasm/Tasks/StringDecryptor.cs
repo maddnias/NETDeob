@@ -14,23 +14,23 @@ using NETDeob.Misc.Structs__Enums___Interfaces.Tasks.Base;
 
 namespace NETDeob.Core.Deobfuscators.Obfusasm.Tasks
 {
-    class StringDecryptor : AssemblyDeobfuscationTask, IStringDecryptor
+    class ObfusasmEntry : DecryptionContext
     {
-        private class ObfusasmEntry : DecryptionContext
+        public int Key;
+        public int Key1;
+        public int Key2;
+
+        public readonly List<Tuple<Instruction, MethodDefinition>> InsertTargets =
+            new List<Tuple<Instruction, MethodDefinition>>();
+
+        public override string ToString()
         {
-            public int Key;
-            public int Key1;
-            public int Key2;
-
-            public readonly List<Tuple<Instruction, MethodDefinition>> InsertTargets =
-                new List<Tuple<Instruction, MethodDefinition>>();
-
-            public override string ToString()
-            {
-                return string.Format(@"[Decrypt]({4}) Key({0}, {1}, {2}) -> ""{3}""", Key, Key1, Key2, PlainText, InsertTargets.Count);
-            }
+            return string.Format(@"[Decrypt]({4}) Key({0}, {1}, {2}) -> ""{3}""", Key, Key1, Key2, PlainText, InsertTargets.Count);
         }
+    }
 
+    class StringDecryptor : AssemblyDeobfuscationTask, IStringDecryptor<ObfusasmEntry>
+    {
         public StringDecryptor(AssemblyDefinition asmDef)
             : base(asmDef)
         {
@@ -78,7 +78,7 @@ namespace NETDeob.Core.Deobfuscators.Obfusasm.Tasks
         public bool Phase2()
         {
             var targetType = PhaseParam;
-            var decEntries = ConstructEntries<ObfusasmEntry>(targetType);
+            var decEntries = ConstructEntries(targetType);
 
             PhaseParam = decEntries;
 
@@ -98,7 +98,7 @@ namespace NETDeob.Core.Deobfuscators.Obfusasm.Tasks
 
             foreach (var t in decEntries)
             {
-                var entry = t as DecryptionContext;
+                var entry = t;
                 DecryptEntry(ref entry);
 
                 Logger.VLog(entry.ToString());
@@ -137,36 +137,59 @@ namespace NETDeob.Core.Deobfuscators.Obfusasm.Tasks
             if (cctor.Body.HasVariables || cctor.Body.Instructions.FirstOrDefault(i => i.OpCode == OpCodes.Ldtoken) == null)
                 return false;
 
+            if (cctor.Body.Instructions.GetOpCodeCount(OpCodes.Ldtoken) != 1)
+                return false;
+
+            if (cctor.Body.Instructions.GetOpCodeCount(OpCodes.Newarr) != 2)
+                return false;
+
+            if (!typeDef.IsSealed || typeDef.Fields.Count != 3)
+                return false;
+
             return true;
         }
         private static bool IsStringProxy(MethodDefinition mDef)
         {
-            if (mDef.Body.HasVariables || mDef.HasParameters)
+            if (mDef.Body.HasVariables || mDef.HasParameters || !mDef.HasBody)
                 return false;
 
             if (mDef.ReturnType.Name != "String")
                 return false;
 
+            var body = mDef.Body;
+
+            if (body.Instructions.GetOpCodeCount(OpCodes.Call) != 1)
+                return false;
+
+            if (body.Instructions.GetOpCodeCount(OpCodes.Ldsfld) != 1)
+                return false;
+
             return true;
+        }
+
+        public bool BaseIsDecryptor(params object[] param)
+        {
+            throw new NotImplementedException();
         }
 
         public void InitializeDecryption(object param)
         {
         }
-        public void DecryptEntry(ref DecryptionContext entry)
+
+        public void DecryptEntry(ref ObfusasmEntry entry)
         {
-            var _entry = entry as ObfusasmEntry;
+            byte[] decryptedString = new byte[entry.Key1];
+            for (int i = 0; i < entry.Key1; i++)
+            {
+                decryptedString[i] = (byte)(_staticKey[entry.Key + i] ^ entry.Key2);
+            }
 
-            for (int i = _entry.Key; i < (_entry.Key + _entry.Key1); i++)
-                _staticKey[i] ^= (byte)_entry.Key2;
-
-            entry.PlainText = Encoding.UTF8.GetString(_staticKey, _entry.Key, _entry.Key1);
+            entry.PlainText = Encoding.UTF8.GetString(decryptedString);
         }
-        public void ProcessEntry(DecryptionContext entry)
-        {
-            var _entry = entry as ObfusasmEntry;
 
-            foreach (var target in _entry.InsertTargets)
+        public void ProcessEntry(ObfusasmEntry entry)
+        {
+            foreach (var target in entry.InsertTargets)
             {
                 var ilProc = target.Item2.Body.GetILProcessor();
                 ilProc.InsertBefore(target.Item1,
@@ -174,17 +197,14 @@ namespace NETDeob.Core.Deobfuscators.Obfusasm.Tasks
             }
         }
 
-        public IEnumerable<T> ConstructEntries<T>(object param) where T : DecryptionContext
+        public IEnumerable<ObfusasmEntry> ConstructEntries(object param)
         {
-            foreach (var mDef in AsmDef.FindMethods(m => true))
+            foreach (var mDef in AsmDef.FindMethods(m => m.HasBody))
             {
-                if (!mDef.HasBody)
-                    continue;
-
                 for (var i = 0; i < mDef.Body.Instructions.Count; i++)
                 {
                     var instr = mDef.Body.Instructions[i];
-                    MethodDefinition tmpTarget = null;
+                    MethodDefinition tmpTarget;
 
                     if (instr.OpCode == OpCodes.Call &&
                         (tmpTarget = (instr.Operand as MethodReference).Resolve()).DeclaringType == param as TypeDefinition)
@@ -209,7 +229,7 @@ namespace NETDeob.Core.Deobfuscators.Obfusasm.Tasks
                         decEntry.InsertTargets.Add(new Tuple<Instruction, MethodDefinition>(instr.Next, mDef));
                         MarkMember(instr, mDef);
 
-                        yield return decEntry as T;
+                        yield return decEntry;
                     }
                 }
             }
