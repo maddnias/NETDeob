@@ -90,7 +90,7 @@ namespace NETDeob.Core.Deobfuscators.Generic
                                 !tDef.IsSpecialName &&
                                 !(tDef.Name.StartsWith("<") && tDef.Name.EndsWith(">"))))
                 {
-                    if (typeDef.Namespace.EndsWith("My") || !_scheme.Types)
+                    if (typeDef.TopParentType().Namespace.EndsWith("My") || !_scheme.Types)
                         continue;
 
                     oldName = typeDef.Name;
@@ -109,10 +109,15 @@ namespace NETDeob.Core.Deobfuscators.Generic
                     if (typeDef.Namespace.EndsWith("My") || !_scheme.Types)
                         continue;
 
+                    if (typeDef.IsGenericInstance || typeDef.IsGenericParameter)
+                        continue;
+
                     #region Methods
 
                     if (_scheme.Methods)
-                        foreach (var mDef in typeDef.Methods.Where(mDef => !mDef.IsRuntimeSpecialName))
+                        foreach (var mDef in typeDef.Methods.Where(mDef => !mDef.IsRuntimeSpecialName 
+                            && !mDef.HasGenericParameters
+                            && !mDef.DeclaringType.HasGenericParameters))
                         {
                             oldName = mDef.Name;
                             mDef.Name = "Method_" + mCount++;
@@ -135,12 +140,12 @@ namespace NETDeob.Core.Deobfuscators.Generic
                     #endregion
                     #region Fields
 
-                    if (_scheme.Fields)
+                    if (_scheme.Fields )
                     {
                         var fCount = 0;
                         foreach (var fieldDef in typeDef.Fields)
                         {
-                            if (fieldDef.IsRuntimeSpecialName)
+                            if (fieldDef.IsRuntimeSpecialName || fieldDef.DeclaringType.HasGenericParameters)
                                 continue;
 
                             oldName = fieldDef.Name;

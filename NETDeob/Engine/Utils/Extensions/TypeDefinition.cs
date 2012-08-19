@@ -89,15 +89,15 @@ namespace NETDeob.Core.Engine.Utils.Extensions
                 }
         }
 
-        public static TypeDefinition TopParentType<T>(T member)
+        public static TypeDefinition TopParentType<T>(this T member) where T : IMemberDefinition
         {
             TypeDefinition topParent;
 
-            if ((topParent = (member as dynamic).DeclaringType) == null)
-                return null;
+            if ((topParent = member.DeclaringType) == null)
+                return member as TypeDefinition;
 
             while (topParent.DeclaringType != null)
-                topParent = (member as dynamic).DeclaringType;
+                topParent = (topParent).DeclaringType;
 
             return topParent;
         }
