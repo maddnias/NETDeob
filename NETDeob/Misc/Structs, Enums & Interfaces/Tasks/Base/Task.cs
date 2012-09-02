@@ -126,26 +126,26 @@ namespace NETDeob.Misc.Structs__Enums___Interfaces.Tasks.Base
             if (Globals.DeobContext.MarkedMembers.Any(mm => mm.Member == member))
                 return;
 
-            var tmpMember = new MarkedMember { Member = member };
+            var tmpMember = new DeobfuscatorContext.MarkedMember { Member = member };
 
             if (member is TypeDefinition)
-                tmpMember.Type = MemberType.Type;
+                tmpMember.Type = DeobfuscatorContext.MemberType.Type;
             else if (member is MethodDefinition)
-                tmpMember.Type = MemberType.Method;
+                tmpMember.Type = DeobfuscatorContext.MemberType.Method;
             else if (member is FieldDefinition)
-                tmpMember.Type = MemberType.Field;
+                tmpMember.Type = DeobfuscatorContext.MemberType.Field;
             else if (member is Delegate)
-                tmpMember.Type = MemberType.Delegate;
+                tmpMember.Type = DeobfuscatorContext.MemberType.Delegate;
             else if (member is PropertyDefinition)
-                tmpMember.Type = MemberType.Property;
+                tmpMember.Type = DeobfuscatorContext.MemberType.Property;
             else if (member is EmbeddedResource)
-                tmpMember.Type = MemberType.Resource;
+                tmpMember.Type = DeobfuscatorContext.MemberType.Resource;
             else if (member is CustomAttribute)
-                tmpMember.Type = MemberType.Attribute;
+                tmpMember.Type = DeobfuscatorContext.MemberType.Attribute;
             else if (member is Instruction)
-                tmpMember.Type = MemberType.Instruction;
+                tmpMember.Type = DeobfuscatorContext.MemberType.Instruction;
             else if (member is AssemblyNameReference)
-                tmpMember.Type = MemberType.AssemblyReference;
+                tmpMember.Type = DeobfuscatorContext.MemberType.AssemblyReference;
 
             tmpMember.ID = ID ?? "";
             tmpMember.ParentMember = parentMember;

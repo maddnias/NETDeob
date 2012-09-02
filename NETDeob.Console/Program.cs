@@ -24,16 +24,16 @@ namespace NETDeob._Console
                                     {"st=|strtok=", t =>
                                                             {
                                                                 if (t != null)
-                                                                   ctx.DynStringCtx = new DynamicStringDecryptionContext
+                                                                   ctx.DynStringCtx = new DeobfuscatorContext.DynamicStringDecryptionContext
                                                                                                            {
                                                                                                                AssociatedToken = Int32.Parse(t, NumberStyles.HexNumber),
-                                                                                                               DecryptionType = StringDecryption.Dynamic
+                                                                                                               DecryptionType = DeobfuscatorContext.StringDecryption.Dynamic
                                                                                                            };
                                                             }},
                                      {"v|verbose", v =>
                                                         {
                                                            if (v != null)
-                                                               ctx.Output = OutputType.Verbose;
+                                                               ctx.Output = DeobfuscatorContext.OutputType.Verbose;
                                                          }},
                                      { "d|debug", d =>
                                                      {

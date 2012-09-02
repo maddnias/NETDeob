@@ -9,19 +9,19 @@ namespace NETDeob.Core.Engine.Utils
 
         public static void VLog(string message)
         {
-            if (Globals.DeobContext.Output == OutputType.Verbose)
+            if (Globals.DeobContext.Output == DeobfuscatorContext.OutputType.Verbose)
                 Console.WriteLine(message);
         }
 
         public static void SLog(string message)
         {
-            if (Globals.DeobContext.Output == OutputType.Subtle)
+            if (Globals.DeobContext.Output == DeobfuscatorContext.OutputType.Subtle)
                 Console.WriteLine(message);
         }
 
         public static void VSLog(string message)
         {
-            if (Globals.DeobContext.Output == OutputType.Subtle || Globals.DeobContext.Output == OutputType.Verbose)
+            if (Globals.DeobContext.Output == DeobfuscatorContext.OutputType.Subtle || Globals.DeobContext.Output == DeobfuscatorContext.OutputType.Verbose)
                 Console.WriteLine(message);
         }
     }

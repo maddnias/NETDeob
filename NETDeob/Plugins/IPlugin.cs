@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using NETDeob.Core.Engine.Utils;
+using NETDeob.Misc.Structs__Enums___Interfaces.Signatures;
 
 namespace NETDeob.Core.Plugins
 {
@@ -13,6 +14,8 @@ namespace NETDeob.Core.Plugins
         string Author { get; }
         string Version { get; }
 
-        void RegisterIdentifierTasks(Action<Identifier.IdentifierTask> register);
+        ISignature Signature { get; set; }
+
+        //void RegisterIdentifierTasks(Action<Identifier.IdentifierTask> register);
     }
 }

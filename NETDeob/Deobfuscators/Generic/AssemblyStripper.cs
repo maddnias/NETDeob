@@ -27,7 +27,7 @@ namespace NETDeob.Core.Deobfuscators.Generic
 
         private static bool RemoveMembers()
         {
-            var tmp = new MarkedMember();
+            var tmp = new DeobfuscatorContext.MarkedMember();
 
             try
             {
@@ -35,48 +35,48 @@ namespace NETDeob.Core.Deobfuscators.Generic
                 {
                     switch (member.Type)
                     {
-                        case MemberType.Type:
+                        case DeobfuscatorContext.MemberType.Type:
                             Logger.VLog("[Remove(Type)] " + (member.Member as TypeDefinition).Name.Truncate(10));
                             AsmDef.MainModule.Types.Remove(member.Member as TypeDefinition);
                             break;
 
-                        case MemberType.Method:
+                        case DeobfuscatorContext.MemberType.Method:
                             Logger.VLog("[Remove(Method)] " + (member.Member as MethodDefinition).Name);
                             (member.Member as MethodDefinition).DeclaringType.Methods.Remove(
                                 member.Member as MethodDefinition);
                             break;
 
-                        case MemberType.Field:
+                        case DeobfuscatorContext.MemberType.Field:
                             Logger.VLog("[Remove(Field)] " + (member.Member as FieldDefinition).Name);
                             (member.Member as FieldDefinition).DeclaringType.Fields.Remove(
                                 member.Member as FieldDefinition);
                             break;
 
-                        case MemberType.Property:
+                        case DeobfuscatorContext.MemberType.Property:
                             Logger.VLog("[Remove(Property)] " + (member.Member as PropertyDefinition).Name);
                             (member.Member as PropertyDefinition).DeclaringType.Properties.Remove(
                                 member.Member as PropertyDefinition);
                             break;
 
-                        case MemberType.Resource:
+                        case DeobfuscatorContext.MemberType.Resource:
                             Logger.VLog("[Remove(Resource)] " +
                                         ((member.Member as EmbeddedResource).Name.Truncate(10)));
                             AsmDef.MainModule.Resources.Remove(member.Member as EmbeddedResource);
                             break;
 
-                        case MemberType.Attribute:
+                        case DeobfuscatorContext.MemberType.Attribute:
                             Logger.VLog("[Remove(Attribute)] " + (member.Member as CustomAttribute).AttributeType.Name);
                             (member.ParentMember as ModuleDefinition).CustomAttributes.Remove(
                                 member.Member as CustomAttribute);
                             break;
 
-                        case MemberType.Instruction:
+                        case DeobfuscatorContext.MemberType.Instruction:
                             Logger.VLog("[Remove(Instruction)] " + (member.Member as Instruction).OpCode);
                             (member.ParentMember as MethodDefinition).Body.Instructions.Remove(
                                 member.Member as Instruction);
                             break;
 
-                        case MemberType.AssemblyReference:
+                        case DeobfuscatorContext.MemberType.AssemblyReference:
                             Logger.VLog("[Remove(AssemblyReference)] " + (member.Member as AssemblyNameReference).MetadataToken.ToInt32());
                             AsmDef.MainModule.AssemblyReferences.Remove(member.Member as AssemblyNameReference);
                             break;

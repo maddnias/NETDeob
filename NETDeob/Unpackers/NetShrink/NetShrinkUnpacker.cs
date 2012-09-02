@@ -1,5 +1,6 @@
 ﻿using System;
 using Mono.Cecil;
+using NETDeob.Core.Unpackers.NetShrink.Tasks;
 using NETDeob.Misc.Structs__Enums___Interfaces;
 
 namespace NETDeob.Core.Unpackers.NetShrink
@@ -13,7 +14,9 @@ namespace NETDeob.Core.Unpackers.NetShrink
 
         public override void CreateTaskQueue()
         {
-            throw new NotImplementedException();
+            TaskQueue.Add(new Unpacker(AsmDef));
+
+            Deobfuscate();
         }
     }
 }

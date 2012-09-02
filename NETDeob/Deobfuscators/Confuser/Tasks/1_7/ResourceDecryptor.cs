@@ -98,7 +98,7 @@ namespace NETDeob.Deobfuscators.Confuser.Tasks._1_7
             foreach (var res in asm.GetManifestResourceNames())
             {
                 var tmpStream = asm.GetManifestResourceStream(res);
-                Globals.DeobContext.ResStreams.Add(new ResEx {Name = res, ResStream = tmpStream});
+                Globals.DeobContext.ResStreams.Add(new DeobfuscatorContext.ResEx {Name = res, ResStream = tmpStream});
                 var buf = new byte[tmpStream.Length]; tmpStream.Read(buf, 0, buf.Length);
                 
                 AsmDef.MainModule.Resources.Add(new EmbeddedResource(res,
