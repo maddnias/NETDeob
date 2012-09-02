@@ -26,10 +26,10 @@ namespace NETDeob.Core.Misc
         DynamicBrute = 2
     }
 
-    public class DynamicStringDecryptionContetx
+    public class DynamicStringDecryptionContext
     {
         public StringDecryption DecryptionType;
-        public List<int> AssociatedTokens;
+        public int AssociatedToken;
     }
 
     public class MarkedMember
@@ -46,26 +46,27 @@ namespace NETDeob.Core.Misc
         public Stream ResStream;
     }
 
-    public static class DeobfuscatorContext
+    public enum OutputType
     {
-        public enum OutputType
-        {
-            Subtle = 0,
-            Verbose = 1
-        }
+        Subtle = 0,
+        Verbose = 1
+    }
 
-        public static bool Debug = false;
 
-        public static OutputType Output;
+    public class DeobfuscatorContext
+    {
+        public bool Debug = false;
 
-        public static DeobfuscatorOptions Options = new DeobfuscatorOptions();
-        public static string InPath;
-        public static string OutPath;
-        public static AssemblyDefinition AsmDef;
-        public static List<MarkedMember> MarkedMembers = new List<MarkedMember>();
-        public static List<ResEx> ResStreams = new List<ResEx>();
-        public static DynamicStringDecryptionContetx DynStringCtx;
+        public OutputType Output = OutputType.Subtle;
 
-        public static ISignature ActiveSignature;
+        public DeobfuscatorOptions Options;
+        public string InPath;
+        public string OutPath;
+        public AssemblyDefinition AsmDef;
+        public List<MarkedMember> MarkedMembers = new List<MarkedMember>();
+        public List<ResEx> ResStreams = new List<ResEx>();
+        public DynamicStringDecryptionContext DynStringCtx;
+
+        public ISignature ActiveSignature;
     }
 }

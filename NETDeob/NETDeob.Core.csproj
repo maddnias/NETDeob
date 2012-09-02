@@ -29,6 +29,7 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <UseVSHostingProcess>true</UseVSHostingProcess>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|x86' ">
     <PlatformTarget>x86</PlatformTarget>
@@ -47,12 +48,10 @@
     <Reference Include="Mono.Cecil">
       <HintPath>.\Mono.Cecil.dll</HintPath>
     </Reference>
-    <Reference Include="SevenZipSharp">
-      <HintPath>.\SevenZipSharp.dll</HintPath>
-    </Reference>
     <Reference Include="System" />
     <Reference Include="System.ComponentModel.Composition" />
     <Reference Include="System.Core" />
+    <Reference Include="System.Runtime.Serialization" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="Microsoft.CSharp" />
@@ -62,15 +61,29 @@
     <Reference Include="System.Windows.Forms" />
     <Reference Include="System.Xml" />
     <Reference Include="WindowsBase" />
-    <Reference Include="zip">
-      <HintPath>.\zip.dll</HintPath>
-    </Reference>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Deobfuscator.cs" />
     <Compile Include="Deobfuscators\Confuser\Tasks\1_7\ProxyResolver2.cs" />
     <Compile Include="Deobfuscators\Generic\MetadataFixer.cs" />
     <Compile Include="Deobfuscators\Generic\GenericStringDecryptor.cs" />
+    <Compile Include="Engine\Utils\Bugster.cs" />
+    <Compile Include="Engine\Utils\Decompression\7zip\Common\CRC.cs" />
+    <Compile Include="Engine\Utils\Decompression\7zip\Common\InBuffer.cs" />
+    <Compile Include="Engine\Utils\Decompression\7zip\Common\OutBuffer.cs" />
+    <Compile Include="Engine\Utils\Decompression\7zip\Compress\LZMA\LzmaBase.cs" />
+    <Compile Include="Engine\Utils\Decompression\7zip\Compress\LZMA\LzmaDecoder.cs" />
+    <Compile Include="Engine\Utils\Decompression\7zip\Compress\LZMA\LzmaEncoder.cs" />
+    <Compile Include="Engine\Utils\Decompression\7zip\Compress\LZ\IMatchFinder.cs" />
+    <Compile Include="Engine\Utils\Decompression\7zip\Compress\LZ\LzBinTree.cs" />
+    <Compile Include="Engine\Utils\Decompression\7zip\Compress\LZ\LzInWindow.cs" />
+    <Compile Include="Engine\Utils\Decompression\7zip\Compress\LZ\LzOutWindow.cs" />
+    <Compile Include="Engine\Utils\Decompression\7zip\Compress\RangeCoder\RangeCoder.cs" />
+    <Compile Include="Engine\Utils\Decompression\7zip\Compress\RangeCoder\RangeCoderBit.cs" />
+    <Compile Include="Engine\Utils\Decompression\7zip\Compress\RangeCoder\RangeCoderBitTree.cs" />
+    <Compile Include="Engine\Utils\Decompression\7zip\ICoder.cs" />
+    <Compile Include="Engine\Utils\Decompression\Lzmat.cs" />
+    <Compile Include="Engine\Utils\Decompression\UnZip.cs" />
     <Compile Include="Engine\Utils\StackTracer.cs" />
     <Compile Include="Deobfuscators\HurpFuscator\HurpDeobfuscator.cs" />
     <Compile Include="Deobfuscators\HurpFuscator\Tasks\1_1\StringDecryptor.cs" />
@@ -118,10 +131,12 @@
     <Compile Include="Engine\Utils\Extensions\TypeDefinition.cs" />
     <Compile Include="Engine\Utils\LzmatWrapper.cs" />
     <Compile Include="Engine\Utils\Extensions\InstructionCollection.cs" />
+    <Compile Include="Globals.cs" />
     <Compile Include="Misc\AssemblyUtils.cs" />
     <Compile Include="Misc\Structs, Enums &amp; Interfaces\Deobfuscation\ProxyResolver.cs" />
     <Compile Include="Misc\Structs, Enums &amp; Interfaces\Deobfuscation\StringDecryptor.cs" />
     <Compile Include="Misc\Structs, Enums &amp; Interfaces\Deobfuscation\PhaseAttribute.cs" />
+    <Compile Include="Misc\Structs, Enums &amp; Interfaces\NETDeobExceptionFormatter.cs" />
     <Compile Include="Misc\Structs, Enums &amp; Interfaces\Signatures\Base\ISignature.cs" />
     <Compile Include="Misc\Structs, Enums &amp; Interfaces\Signatures\IPackerSignature.cs" />
     <Compile Include="Misc\Structs, Enums &amp; Interfaces\Signatures\IUnsupportedSignature.cs" />
@@ -176,15 +191,18 @@
     </Compile>
   </ItemGroup>
   <ItemGroup>
-    <Content Include="bin\Debug\test_lzmat.exe" />
-  </ItemGroup>
-  <ItemGroup>
+    <ProjectReference Include="..\ICSharpCode.SharpZipLib\ICSharpCode.SharpZLib.csproj">
+      <Project>{0E7413FF-EB9E-4714-ACF2-BE3A6A7B2FFD}</Project>
+      <Name>ICSharpCode.SharpZLib</Name>
+    </ProjectReference>
     <ProjectReference Include="blocks\blocks.csproj">
       <Project>{045B96F2-AF80-4C4C-8D27-E38635AC705E}</Project>
       <Name>blocks</Name>
     </ProjectReference>
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <Folder Include="bin\Debug\" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

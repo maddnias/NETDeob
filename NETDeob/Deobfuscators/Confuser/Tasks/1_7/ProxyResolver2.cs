@@ -22,7 +22,7 @@ namespace NETDeob.Core.Deobfuscators.Confuser.Tasks._1_7
             public TypeDefinition AssociatedProxyType;
         }
 
-        public Assembly RAssembly = Assembly.LoadFile(DeobfuscatorContext.InPath);
+        public Assembly RAssembly = Assembly.LoadFile(Globals.DeobContext.InPath);
         public MethodDefinition Resolver;
         public List<TypeDefinition> ProxyTypes;
         public List<ProxyCall> ProxyCalls;

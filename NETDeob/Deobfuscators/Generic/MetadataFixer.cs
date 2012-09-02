@@ -52,9 +52,9 @@ namespace NETDeob.Core.Deobfuscators.Generic
         //[DeobfuscationPhase(3, "Re-load cleaned assembly")]
         //public bool Phase3()
         //{
-        //    AsmDef.Write(DeobfuscatorContext.InPath + "_mdfix.exe");
-        //    DeobfuscatorContext.InPath = DeobfuscatorContext.InPath + "_mdfix.exe";
-        //    DeobfuscatorContext.AsmDef = AssemblyDefinition.ReadAssembly(DeobfuscatorContext.InPath);
+        //    AsmDef.Write(Globals.DeobContext.InPath + "_mdfix.exe");
+        //    Globals.DeobContext.InPath = Globals.DeobContext.InPath + "_mdfix.exe";
+        //    Globals.DeobContext.AsmDef = AssemblyDefinition.ReadAssembly(Globals.DeobContext.InPath);
 
         //    return true;
         //}

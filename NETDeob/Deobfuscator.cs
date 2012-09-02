@@ -7,6 +7,7 @@ using Mono.Cecil;
 using NETDeob.Core.Engine.Utils;
 using NETDeob.Core.Engine.Utils.Extensions;
 using NETDeob.Core.Misc;
+using NETDeob.Core.Misc.Structs__Enums___Interfaces;
 using NETDeob.Core.Plugins;
 
 namespace NETDeob.Core
@@ -15,27 +16,42 @@ namespace NETDeob.Core
     {
         //TODO: Add more overloads for Deobfuscate, hopefully more advanced parameters for deobfuscation in the future
 
-        private DeobfuscatorOptions _options = DeobfuscatorContext.Options;
+        private DeobfuscatorOptions _options;
         private List<string> _registeredPlugins = new List<string>();
         
-
-        //public Deobfuscator(DeobfuscatorOptions options)
-        //{
-        //    _options = options;
-
-        //    // To keep NETDeob from crashing when an exception occurs
-        //    if(options.UnhandledExceptionHandler != null)
-        //        AppDomain.CurrentDomain.UnhandledException += options.UnhandledExceptionHandler;
-        //}
-
-        public void Deobfuscate(DynamicStringDecryptionContetx strCtx = null)
+        public Deobfuscator(DeobfuscatorContext context)
         {
-            if (DeobfuscatorContext.Options.UnhandledExceptionHandler != null)
-                AppDomain.CurrentDomain.UnhandledException += DeobfuscatorContext.Options.UnhandledExceptionHandler;
+            Globals.DeobContext = context;
+
+            Globals.Bugster = new BugReporter("150fa190dbb7a61815b4103fee172550", new NETDeobExceptionFormatter());
+            AppDomain.CurrentDomain.UnhandledException += Globals.Bugster.UnhandledExceptionHandler;
+            Globals.Bugster.ReportCompleted += (o, e) =>
+                                                   {
+                                                       if (e.WasSuccesful)
+                                                       {
+                                                           Console.WriteLine(
+                                                               "\nAn unhandled exception have occured and caused NETDeob to terminate!\n\nAn automatic report have been sent to the author.");
+                                                           Console.ReadLine();
+                                                           Environment.Exit(-1);
+                                                       }
+                                                       else
+                                                       {
+                                                           Console.WriteLine("Contact author!");
+                                                           Console.ReadLine();
+                                                           Environment.Exit(-1);
+                                                       }
+                                                   };
+            
+            _options = Globals.DeobContext.Options = Globals.DeobContext.Options ?? new DeobfuscatorOptions();
+        }
+
+        public void Deobfuscate()
+        {
+            if (Globals.DeobContext.Options.UnhandledExceptionHandler != null)
+                AppDomain.CurrentDomain.UnhandledException += Globals.DeobContext.Options.UnhandledExceptionHandler;
 
             LoadPlugins();
-            DeobfuscatorContext.DynStringCtx = strCtx;
-            TaskAssigner.AssignDeobfuscation(DeobfuscatorContext.AsmDef);
+            TaskAssigner.AssignDeobfuscation(Globals.DeobContext.AsmDef);
         }
 
         public void Deobfuscate(AssemblyDefinition[] asmDefs)
@@ -48,7 +64,7 @@ namespace NETDeob.Core
         public string FetchSignature()
         {
             LoadPlugins();
-            var sig = Identifier.Identify(DeobfuscatorContext.AsmDef);
+            var sig = Identifier.Identify(Globals.DeobContext.AsmDef);
             return string.Format("Name: {0}\r\nVersion: {1}", sig.Name, sig.Ver);
         }
 

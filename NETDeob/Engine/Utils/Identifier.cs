@@ -40,9 +40,9 @@ namespace NETDeob.Core.Engine.Utils
 
                 if (found)
                 {
-                    if (!DeobfuscatorContext.Debug)
+                    if (!Globals.DeobContext.Debug)
                     {
-                        DeobfuscatorContext.ActiveSignature = signature;
+                        Globals.DeobContext.ActiveSignature = signature;
                         return signature;
                     }
 
@@ -101,7 +101,7 @@ namespace NETDeob.Core.Engine.Utils
         private static ISignature IdentifyConfuser(AssemblyDefinition asmDef, out bool found)
         {
             var pattern = new Regex("Confuser v[0-9].[0-9].[0-9].[0-9]");
-            var match = pattern.Match(File.ReadAllText(DeobfuscatorContext.InPath));
+            var match = pattern.Match(File.ReadAllText(Globals.DeobContext.InPath));
           
             if(match.Success)
             {

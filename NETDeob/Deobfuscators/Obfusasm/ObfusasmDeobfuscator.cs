@@ -19,7 +19,11 @@ namespace NETDeob.Core.Deobfuscators.Obfusasm
             TaskQueue.Add(new MethodCleaner(AsmDef));
             //TaskQueue.Add(new Renamer(AsmDef, new RenamingScheme(true) {Resources = false}));
             TaskQueue.Add(new Renamer(AsmDef, new RenamingScheme(false) { Methods = true, Fields = true, Properties = true, Parameters = true, Events = true, Delegates = true}));
-            TaskQueue.Add(new StringDecryptor(AsmDef));
+
+            if (Globals.DeobContext.DynStringCtx == null)
+                TaskQueue.Add(new StringDecryptor(AsmDef));
+            else
+                TaskQueue.Add(new GenericStringDecryptor(AsmDef));
 
             Deobfuscate();
         }

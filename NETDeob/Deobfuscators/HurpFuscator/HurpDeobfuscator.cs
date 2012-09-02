@@ -22,10 +22,16 @@ namespace NETDeob.Core.Deobfuscators.HurpFuscator
             TaskQueue.Add(new MethodCleaner(AsmDef));
             TaskQueue.Add(new MetadataFixer(AsmDef));
 
-            if(DeobfuscatorContext.ActiveSignature.Ver.Major == 1 && DeobfuscatorContext.ActiveSignature.Ver.Minor == 0)
-                TaskQueue.Add(new Tasks._1_0.StringDecryptor(AsmDef));
+            if (Globals.DeobContext.ActiveSignature.Ver.Major == 1 && Globals.DeobContext.ActiveSignature.Ver.Minor == 0)
+                if (Globals.DeobContext.DynStringCtx == null)
+                    TaskQueue.Add(new Tasks._1_0.StringDecryptor(AsmDef));
+                else
+                    TaskQueue.Add(new GenericStringDecryptor(AsmDef));
             else
-                TaskQueue.Add(new Tasks._1_1.StringDecryptor(AsmDef));
+                if (Globals.DeobContext.DynStringCtx == null)
+                    TaskQueue.Add(new Tasks._1_1.StringDecryptor(AsmDef));
+                else
+                    TaskQueue.Add(new GenericStringDecryptor(AsmDef));
 
             TaskQueue.Add(new Renamer(AsmDef, new RenamingScheme(true)));
             Deobfuscate();

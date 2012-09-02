@@ -4,6 +4,7 @@ using System.Linq;
 using System.Windows.Forms;
 using Mono.Cecil;
 using NETDeob.Core.Engine.Utils;
+using NETDeob.Core.Engine.Utils.Decompression;
 using NETDeob.Core.Engine.Utils.Extensions;
 using NETDeob.Core.Misc;
 using NETDeob.Deobfuscators;
@@ -27,7 +28,7 @@ namespace NETDeob.Core.Unpackers.Mpress.Tasks
             var target = AsmDef.FindMethod(mDef => mDef.Name == "lf");
             _offset = (int)Convert.ChangeType(target.Body.Instructions.First(instr => instr.IsLdcI4WOperand()).Operand, typeof(Int32));
 
-            PhaseParam = lf(DeobfuscatorContext.InPath);
+            PhaseParam = lf(Globals.DeobContext.InPath);
             
             if(PhaseParam.Length == 0)
             {
@@ -41,35 +42,19 @@ namespace NETDeob.Core.Unpackers.Mpress.Tasks
             }
 
             Logger.VSLog("Retrieved compressed data...");
-
             return true;
         }
 
         [DeobfuscationPhase(2, "Decompression")]
         public static bool Phase2()
         {
-            string filename;
-            File.WriteAllBytes(filename = Path.Combine(Application.StartupPath, "tmpFile.exe"), PhaseParam);
+            var decompressed = new byte[PhaseParam.Length];
+            uint decompressedLen = 0;
 
-            if (LzmatWrapper.Decompress(filename))
-                Logger.VSLog(string.Format("Decompressed file, raw size: {0}...", File.ReadAllBytes(filename).Length));
-            else
-            {
-                PhaseError = new PhaseError
-                {
-                    Level = PhaseError.ErrorLevel.Critical,
-                    Message = "Failed to decompress data!"
-                };
+            if (Lzmat.decompress(decompressed, out decompressedLen, PhaseParam) == LzmatStatus.OK)
+                Logger.VSLog(string.Format("Decompressed file, raw size: {0}...", decompressedLen));
 
-                return false;
-            }
-
-            if (File.Exists(Path.Combine(Application.StartupPath, "tmpFile.exe")))
-            {
-                File.Delete(Path.Combine(Application.StartupPath, "tmpFile.exe"));
-                Logger.VSLog("Cleaned up files...");
-            }
-
+            File.WriteAllBytes(Globals.DeobContext.OutPath, decompressed);
             return true;
         }
 

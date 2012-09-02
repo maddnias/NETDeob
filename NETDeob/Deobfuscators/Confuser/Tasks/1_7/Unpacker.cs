@@ -9,6 +9,7 @@ using System.Text;
 using System.Threading;
 using Mono.Cecil;
 using Mono.Cecil.Cil;
+using NETDeob.Core;
 using NETDeob.Core.Engine.Utils;
 using NETDeob.Core.Engine.Utils.Extensions;
 using NETDeob.Core.Misc;
@@ -34,7 +35,7 @@ namespace NETDeob.Deobfuscators.Confuser.Tasks._1_7
                 return true;
             }
 
-            var resStream = Assembly.LoadFile(DeobfuscatorContext.InPath).GetManifestResourceStream(resName);
+            var resStream = Assembly.LoadFile(Globals.DeobContext.InPath).GetManifestResourceStream(resName);
 
             if(resStream == null){
                 ThrowPhaseError("Could not load resource stream!", 1, false);

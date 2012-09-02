@@ -16,7 +16,7 @@ namespace NETDeob.Core.Engine.Utils
                                    {
                                        FileName = Path.Combine(Application.StartupPath, "test_lzmat.exe"),
                                        Arguments =
-                                           string.Format(@"d ""{0}"" ""{1}""", file, DeobfuscatorContext.OutPath),
+                                           string.Format(@"d ""{0}"" ""{1}""", file, Globals.DeobContext.OutPath),
                                        RedirectStandardOutput = true,
                                        UseShellExecute = false,
                                        CreateNoWindow = false
@@ -26,7 +26,7 @@ namespace NETDeob.Core.Engine.Utils
             proc.Start();
             proc.WaitForExit();
 
-            if (!File.Exists(DeobfuscatorContext.OutPath))
+            if (!File.Exists(Globals.DeobContext.OutPath))
             {
                 Logger.VSLog("Failed to decompress data!");
                 return false;

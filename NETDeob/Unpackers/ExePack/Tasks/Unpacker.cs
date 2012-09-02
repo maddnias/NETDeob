@@ -67,7 +67,7 @@ namespace NETDeob.Core.Unpackers.ExePack.Tasks
             }
 
             Logger.VSLog(string.Format("Decompressed data, raw size: {0} bytes...", finalData.Length));
-            File.WriteAllBytes(DeobfuscatorContext.OutPath, finalData);
+            File.WriteAllBytes(Globals.DeobContext.OutPath, finalData);
 
             return true;
         }
@@ -76,7 +76,7 @@ namespace NETDeob.Core.Unpackers.ExePack.Tasks
 
         public static byte[] Decompress(string resName)
         {
-            using (Stream stream = Assembly.LoadFile(DeobfuscatorContext.InPath).GetManifestResourceStream(resName))
+            using (Stream stream = Assembly.LoadFile(Globals.DeobContext.InPath).GetManifestResourceStream(resName))
             {
                 int num;
 

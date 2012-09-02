@@ -12,7 +12,7 @@ namespace NETDeob.Core.Misc
     {
         public static IEnumerable<Tuple<Instruction, MethodDefinition>> FindMethodReferences(MethodDefinition target)
         {
-            foreach(var mDef in DeobfuscatorContext.AsmDef.FindMethods(m => true))
+            foreach(var mDef in Globals.DeobContext.AsmDef.FindMethods(m => true))
             {
                 if (!mDef.HasBody)
                     continue;

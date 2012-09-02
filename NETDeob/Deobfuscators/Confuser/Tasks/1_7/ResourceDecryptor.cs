@@ -4,6 +4,7 @@ using System.Linq;
 using System.Reflection;
 using Mono.Cecil;
 using Mono.Cecil.Cil;
+using NETDeob.Core;
 using NETDeob.Core.Engine.Utils;
 using NETDeob.Core.Engine.Utils.Extensions;
 using NETDeob.Core.Misc;
@@ -69,7 +70,7 @@ namespace NETDeob.Deobfuscators.Confuser.Tasks._1_7
             }
 
             MarkMember(AsmDef.MainModule.Resources.First(r => r.Name == resName));
-            var streamRes = Assembly.LoadFile(DeobfuscatorContext.InPath).GetManifestResourceStream(resName);
+            var streamRes = Assembly.LoadFile(Globals.DeobContext.InPath).GetManifestResourceStream(resName);
 
             using(var br = new BinaryReader(new DeflateStream(streamRes, CompressionMode.Decompress)))
             {
@@ -97,7 +98,7 @@ namespace NETDeob.Deobfuscators.Confuser.Tasks._1_7
             foreach (var res in asm.GetManifestResourceNames())
             {
                 var tmpStream = asm.GetManifestResourceStream(res);
-                DeobfuscatorContext.ResStreams.Add(new ResEx {Name = res, ResStream = tmpStream});
+                Globals.DeobContext.ResStreams.Add(new ResEx {Name = res, ResStream = tmpStream});
                 var buf = new byte[tmpStream.Length]; tmpStream.Read(buf, 0, buf.Length);
                 
                 AsmDef.MainModule.Resources.Add(new EmbeddedResource(res,
@@ -107,11 +108,11 @@ namespace NETDeob.Deobfuscators.Confuser.Tasks._1_7
                                            AsmDef.MainModule.Resources[AsmDef.MainModule.Resources.Count -1].Name));
             }
 
-            DeobfuscatorContext.ResStreams.Clear();
+            Globals.DeobContext.ResStreams.Clear();
 
             // For compability with constant decryptor
-            AsmDef.Write(DeobfuscatorContext.InPath + "_resdump.exe");
-            DeobfuscatorContext.InPath = DeobfuscatorContext.InPath + "_resdump.exe";
+            AsmDef.Write(Globals.DeobContext.InPath + "_resdump.exe");
+            Globals.DeobContext.InPath = Globals.DeobContext.InPath + "_resdump.exe";
 
             return true;
         }

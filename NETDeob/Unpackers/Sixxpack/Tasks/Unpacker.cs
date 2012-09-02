@@ -10,7 +10,10 @@ using NETDeob.Deobfuscators;
 using NETDeob.Misc;
 using NETDeob.Misc.Structs__Enums___Interfaces.Deobfuscation;
 using NETDeob.Misc.Structs__Enums___Interfaces.Tasks.Base;
-using SevenZip.Sdk.Compression.Lzma;
+using NETDeob.Core.Engine.Utils.Decompression;
+using SevenZip.Compression.LZMA;
+
+//using SevenZip.Sdk.Compression.Lzma;
 
 namespace NETDeob.Core.Unpackers.Sixxpack.Tasks
 {
@@ -49,7 +52,7 @@ namespace NETDeob.Core.Unpackers.Sixxpack.Tasks
             var orig = PhaseParam;
             var inStream = new MemoryStream();
 
-            var stream2 = new FileStream(DeobfuscatorContext.InPath, FileMode.Open, FileAccess.Read)
+            var stream2 = new FileStream(Globals.DeobContext.InPath, FileMode.Open, FileAccess.Read)
                               {
                                   Position = orig
                               };
@@ -84,7 +87,7 @@ namespace NETDeob.Core.Unpackers.Sixxpack.Tasks
             Logger.VSLog(string.Format("Decompressed stream, raw size: {0}...", finalData.Length));
 
             dataStream.Dispose();
-            File.WriteAllBytes(DeobfuscatorContext.OutPath, finalData);
+            File.WriteAllBytes(Globals.DeobContext.OutPath, finalData);
 
             return true;
         }

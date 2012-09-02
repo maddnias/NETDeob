@@ -31,7 +31,7 @@ namespace NETDeob.Core.Deobfuscators.Generic
 
             try
             {
-                foreach (var member in DeobfuscatorContext.MarkedMembers)
+                foreach (var member in Globals.DeobContext.MarkedMembers)
                 {
                     switch (member.Type)
                     {
@@ -93,7 +93,7 @@ namespace NETDeob.Core.Deobfuscators.Generic
                 ThrowPhaseError("Failed to clean up member!", 0, false);
             }
 
-            var totalNum = DeobfuscatorContext.MarkedMembers.Sum(member => member.Member.CalcChildMembers());
+            var totalNum = Globals.DeobContext.MarkedMembers.Sum(member => member.Member.CalcChildMembers());
 
             Logger.VSLog(string.Format("{0} members cleaned from assembly...", totalNum));
             return true;

@@ -16,7 +16,12 @@ namespace NETDeob.Core.Deobfuscators.Manco
         {
             TaskQueue.Add(new MethodCleaner(AsmDef));
             TaskQueue.Add(new CFlowCleaner(AsmDef));
-            TaskQueue.Add(new StringDecryptor(AsmDef));
+
+            if (Globals.DeobContext.DynStringCtx == null)
+                TaskQueue.Add(new StringDecryptor(AsmDef));
+            else
+                TaskQueue.Add(new GenericStringDecryptor(AsmDef));
+
             TaskQueue.Add(new Renamer(AsmDef, new RenamingScheme(true)));
 
             Deobfuscate();

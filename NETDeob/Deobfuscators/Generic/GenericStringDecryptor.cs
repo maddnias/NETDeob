@@ -11,7 +11,6 @@ using NETDeob.Core.Engine.Utils.Extensions;
 using NETDeob.Core.Misc;
 using NETDeob.Deobfuscators;
 using NETDeob.Misc.Structs__Enums___Interfaces.Deobfuscation;
-using Ctx = NETDeob.Core.Misc.DeobfuscatorContext;
 using OpCodes = Mono.Cecil.Cil.OpCodes;
 using ROpCodes = System.Reflection.Emit.OpCodes;
 
@@ -79,7 +78,7 @@ namespace NETDeob.Core.Deobfuscators.Generic
 
     public class GenericStringDecryptor : AssemblyDeobfuscationTask, IStringDecryptor<GenericDecryptionContext>
     {
-        private static Assembly _rAssembly = Assembly.LoadFile(Ctx.InPath);
+        private static Assembly _rAssembly = Assembly.LoadFile(Globals.DeobContext.InPath);
 
         public GenericStringDecryptor(AssemblyDefinition asmDef)
             : base(asmDef)
@@ -93,7 +92,7 @@ namespace NETDeob.Core.Deobfuscators.Generic
 
             if (decMethods.Count == 0)
             {
-                ThrowPhaseError("Could not locate any decryptor method!", 1, false);
+                ThrowPhaseError("Could not locate any decryptor method! (bad token?)", 1, false);
                 return false;
             }
 
@@ -170,7 +169,7 @@ namespace NETDeob.Core.Deobfuscators.Generic
         public bool BaseIsDecryptor(params object[] param)
         {
             var mDef = param[0] as MethodDefinition;
-            return Ctx.DynStringCtx.AssociatedTokens.Any(token => mDef.MetadataToken.ToInt32() == Ctx.DynStringCtx.AssociatedTokens[0]);
+            return Globals.DeobContext.DynStringCtx.AssociatedToken == mDef.MetadataToken.ToInt32();
         }
         public void InitializeDecryption(object param)
         {

@@ -4,6 +4,7 @@ using ICSharpCode.SharpZipLib.Zip.Compression.Streams;
 using Mono.Cecil;
 using Mono.Cecil.Cil;
 using NETDeob.Core.Engine.Utils;
+using NETDeob.Core.Engine.Utils.Decompression;
 using NETDeob.Core.Engine.Utils.Extensions;
 using NETDeob.Core.Misc;
 using NETDeob.Deobfuscators;
@@ -78,7 +79,7 @@ namespace NETDeob.Core.Unpackers.Netz.Tasks
         {
             var resData = PhaseParam;
 
-            File.WriteAllBytes(DeobfuscatorContext.OutPath, GetAssemblyData(resData));
+            File.WriteAllBytes(Globals.DeobContext.OutPath, GetAssemblyData(resData));
             Logger.VSLog("Writing decompressed payload to disk...");
 
             return true;
@@ -92,51 +93,10 @@ namespace NETDeob.Core.Unpackers.Netz.Tasks
         {
             Logger.VSLog("Decompressing payload (" + data.Length + " bytes)...");
 
-            MemoryStream stream = UnZip(data);
+            MemoryStream stream = UnZip.ProcessData(data);
             stream.Seek(0L, SeekOrigin.Begin);
 
             return stream.ToArray();
-        }
-
-        private static MemoryStream UnZip(byte[] data)
-        {
-            if (data == null)
-            {
-                return null;
-            }
-            MemoryStream baseInputStream = null;
-            MemoryStream stream2;
-            InflaterInputStream stream3 = null;
-            try
-            {
-                baseInputStream = new MemoryStream(data);
-                stream2 = new MemoryStream();
-                stream3 = new InflaterInputStream(baseInputStream);
-                byte[] buffer = new byte[data.Length];
-                while (true)
-                {
-                    int count = stream3.Read(buffer, 0, buffer.Length);
-                    if (count <= 0)
-                    {
-                        break;
-                    }
-                    stream2.Write(buffer, 0, count);
-                }
-                stream2.Flush();
-                stream2.Seek(0L, SeekOrigin.Begin);
-            }
-            finally
-            {
-                if (baseInputStream != null)
-                {
-                    baseInputStream.Close();
-                }
-                if (stream3 != null)
-                {
-                    stream3.Close();
-                }
-            }
-            return stream2;
         }
 
         #endregion

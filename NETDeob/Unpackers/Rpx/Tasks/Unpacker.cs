@@ -43,12 +43,12 @@ namespace NETDeob.Core.Unpackers.Rpx.Tasks
 
             using (var package = Package.Open(resStream, FileMode.Open, FileAccess.Read))
             {
-                //File.WriteAllBytes(DeobfuscatorContext.OutPath,
+                //File.WriteAllBytes(Globals.DeobContext.OutPath,
                 //                   DecompressData(package,
                 //                                  string.Concat("/",
-                //                                                DeobfuscatorContext.InPath.Substring(
-                //                                                    DeobfuscatorContext.InPath.LastIndexOf("\\", StringComparison.Ordinal) + 1))));
-                File.WriteAllBytes(DeobfuscatorContext.OutPath,
+                //                                                Globals.DeobContext.InPath.Substring(
+                //                                                    Globals.DeobContext.InPath.LastIndexOf("\\", StringComparison.Ordinal) + 1))));
+                File.WriteAllBytes(Globals.DeobContext.OutPath,
                                    DecompressData(package,
                                                   AsmDef.EntryPoint.Body.Instructions.GetOperandAt<string>(
                                                       OpCodes.Ldstr, 1)));

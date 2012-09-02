@@ -5,6 +5,7 @@ using System.Reflection;
 using System.Text;
 using Mono.Cecil;
 using Mono.Cecil.Cil;
+using NETDeob.Core;
 using NETDeob.Core.Engine.Utils;
 using NETDeob.Core.Misc;
 using NETDeob.Deobfuscators;
@@ -39,7 +40,7 @@ namespace NETDeob.Misc.Structs__Enums___Interfaces.Tasks.Base
 
     public abstract class Task
     {
-        public static int MarkedMemberCount { get { return DeobfuscatorContext.MarkedMembers.Count; } }
+        public static int MarkedMemberCount { get { return Globals.DeobContext.MarkedMembers.Count; } }
 
         public static AssemblyDefinition AsmDef;
         public object CurrentInstance;
@@ -122,7 +123,7 @@ namespace NETDeob.Misc.Structs__Enums___Interfaces.Tasks.Base
             if (member == null)
                 return;
 
-            if (DeobfuscatorContext.MarkedMembers.Any(mm => mm.Member == member))
+            if (Globals.DeobContext.MarkedMembers.Any(mm => mm.Member == member))
                 return;
 
             var tmpMember = new MarkedMember { Member = member };
@@ -148,12 +149,12 @@ namespace NETDeob.Misc.Structs__Enums___Interfaces.Tasks.Base
 
             tmpMember.ID = ID ?? "";
             tmpMember.ParentMember = parentMember;
-            DeobfuscatorContext.MarkedMembers.Add(tmpMember);
+            Globals.DeobContext.MarkedMembers.Add(tmpMember);
         }
         public static void RemoveMark(string ID)
         {
-            DeobfuscatorContext.MarkedMembers.Remove(
-                DeobfuscatorContext.MarkedMembers.FirstOrDefault(m => m.ID == ID));
+            Globals.DeobContext.MarkedMembers.Remove(
+                Globals.DeobContext.MarkedMembers.FirstOrDefault(m => m.ID == ID));
         }
         public static void ThrowPhaseError(string message, int level, bool emergency)
         {

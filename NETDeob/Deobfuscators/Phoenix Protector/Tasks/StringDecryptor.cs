@@ -12,7 +12,7 @@ using NETDeob.Misc.Structs__Enums___Interfaces.Tasks.Base;
 
 namespace NETDeob.Deobfuscators.Phoenix_Protector
 {
-    public class PhoenixStringWorker : AssemblyDeobfuscationTask, IStringDecryptor
+    public class StringDecryptor : AssemblyDeobfuscationTask, IStringDecryptor
     {
         public class PhoenixEntry : DecryptionContext
         {
@@ -27,7 +27,7 @@ namespace NETDeob.Deobfuscators.Phoenix_Protector
             }
         }
 
-        public PhoenixStringWorker(AssemblyDefinition asmDef)
+        public StringDecryptor(AssemblyDefinition asmDef)
             : base(asmDef)
         {
             RoutineDescription = "String decryption";

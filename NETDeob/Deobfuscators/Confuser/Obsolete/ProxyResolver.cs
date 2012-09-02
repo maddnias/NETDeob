@@ -5,6 +5,7 @@ using System.Reflection;
 using System.Text;
 using Mono.Cecil;
 using Mono.Cecil.Cil;
+using NETDeob.Core;
 using NETDeob.Core.Misc;
 using NETDeob.Deobfuscators;
 using NETDeob.Misc;
@@ -173,7 +174,7 @@ namespace NETDeob.Deobfuscators.Confuser.Tasks._1_7
         public static bool Phase3()
         {
             AntiProxyParams Params = PhaseParam;
-            Params.asmReflection = Assembly.LoadFile(DeobfuscatorContext.InPath);
+            Params.asmReflection = Assembly.LoadFile(Globals.DeobContext.InPath);
 
             InitMethodCallList();
 

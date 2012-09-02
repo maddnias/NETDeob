@@ -17,7 +17,7 @@ namespace NETDeob.Core.Deobfuscators.Unidentified
             TaskQueue.Add(new MethodCleaner(AsmDef));
             //TaskQueue.Add(new MetadataFixer(AsmDef));
 
-            if (DeobfuscatorContext.DynStringCtx != null)
+            if (Globals.DeobContext.DynStringCtx != null)
                 TaskQueue.Add(new GenericStringDecryptor(AsmDef));
 
             TaskQueue.Add(new Renamer(AsmDef, new RenamingScheme(true) { Resources = false }));

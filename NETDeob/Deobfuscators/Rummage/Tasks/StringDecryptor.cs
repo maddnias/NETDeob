@@ -31,9 +31,9 @@ namespace NETDeob.Core.Deobfuscators.Rummage.Tasks
         }
     }
 
-    public class RummageStringDecryptor : AssemblyDeobfuscationTask, IStringDecryptor<RummageContext>
+    public class StringDecryptor : AssemblyDeobfuscationTask, IStringDecryptor<RummageContext>
     {
-        public RummageStringDecryptor(AssemblyDefinition asmDef)
+        public StringDecryptor(AssemblyDefinition asmDef)
             : base(asmDef)
         {
             RoutineDescription = "String decryption";
@@ -178,7 +178,7 @@ namespace NETDeob.Core.Deobfuscators.Rummage.Tasks
         {
             _offset = (int) param;
 
-            using (var fs = new FileStream(DeobfuscatorContext.InPath, FileMode.Open, FileAccess.Read))
+            using (var fs = new FileStream(Globals.DeobContext.InPath, FileMode.Open, FileAccess.Read))
             {
                 fs.Seek(-48L, SeekOrigin.End);
 
@@ -240,7 +240,7 @@ namespace NETDeob.Core.Deobfuscators.Rummage.Tasks
                 ThrowPhaseError("Failed to decrypt string!", 0, false);
 
             var str = "";
-            using (var fs = new FileStream(DeobfuscatorContext.InPath, FileMode.Open, FileAccess.Read))
+            using (var fs = new FileStream(Globals.DeobContext.InPath, FileMode.Open, FileAccess.Read))
             {
                 using (var br = new BinaryReader(fs))
                 {

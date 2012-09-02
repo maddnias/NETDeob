@@ -8,6 +8,7 @@ using System.Reflection;
 using System.Text;
 using Mono.Cecil;
 using Mono.Cecil.Cil;
+using NETDeob.Core;
 using NETDeob.Core.Engine.Utils;
 using NETDeob.Core.Misc;
 using NETDeob.Misc.Structs__Enums___Interfaces.Deobfuscation;
@@ -63,19 +64,19 @@ namespace NETDeob.Deobfuscators.Confuser.Tasks._1_7
                 return false;
             }
 
-            if (DeobfuscatorContext.ResStreams.Count == 0)
+            if (Globals.DeobContext.ResStreams.Count == 0)
             {
                 PhaseParam = new object[]
                                  {
-                                     Assembly.LoadFile(DeobfuscatorContext.InPath).GetManifestResourceStream(resName),
+                                     Assembly.LoadFile(Globals.DeobContext.InPath).GetManifestResourceStream(resName),
                                      decryptor
                                  };
 
                 // Resource decryption compability
-                DeobfuscatorContext.InPath = DeobfuscatorContext.InPath.Replace("_resdump.exe", null);
+                Globals.DeobContext.InPath = Globals.DeobContext.InPath.Replace("_resdump.exe", null);
             }
             else
-                PhaseParam = new object[] { DeobfuscatorContext.ResStreams.First(res => res.Name == resName), decryptor };
+                PhaseParam = new object[] { Globals.DeobContext.ResStreams.First(res => res.Name == resName), decryptor };
 
             if (PhaseParam[0] == null){
                 ThrowPhaseError("Null stream!", 1, false);

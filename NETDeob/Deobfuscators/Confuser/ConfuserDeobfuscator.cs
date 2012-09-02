@@ -24,7 +24,7 @@ namespace NETDeob.Core.Deobfuscators.Confuser
 
         public override void CreateTaskQueue()
         {
-            switch((DeobfuscatorContext.ActiveSignature).Ver.Minor)
+            switch((Globals.DeobContext.ActiveSignature).Ver.Minor)
             {
                 case 7:
                     TaskQueue.Add(new MetadataFixer(AsmDef));
